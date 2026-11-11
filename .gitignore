@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+*.log
+.DS_Store
+.turbo/
+build/
+.vercel/
+*.tsbuildinfo
+
+# Oracle JDK (large binary, not source code)
+src/pages/oracleJdk-27/

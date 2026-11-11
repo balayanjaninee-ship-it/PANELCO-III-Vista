@@ -1,0 +1,161 @@
+/* ============================================================
+   PANELCO VehicleHub — Standard Typography System
+   Material Design 3 type scale with CSS variables
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* Font family — Inter used across the entire system */
+    --font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+    /* --- CSS Variables for type sizes (px) --- */
+    --typo-display-size: 57px;
+    --typo-display-line-height: 64px;
+    --typo-display-weight: 400;
+    --typo-display-tracking: -0.25px;
+
+    --typo-headline-lg-size: 32px;
+    --typo-headline-lg-line-height: 40px;
+    --typo-headline-lg-weight: 400;
+    --typo-headline-lg-tracking: 0;
+
+    --typo-headline-md-size: 28px;
+    --typo-headline-md-line-height: 36px;
+    --typo-headline-md-weight: 400;
+    --typo-headline-md-tracking: 0;
+
+    --typo-headline-sm-size: 24px;
+    --typo-headline-sm-line-height: 32px;
+    --typo-headline-sm-weight: 700;
+    --typo-headline-sm-tracking: 0;
+
+    --typo-title-lg-size: 22px;
+    --typo-title-lg-line-height: 28px;
+    --typo-title-lg-weight: 500;
+    --typo-title-lg-tracking: 0;
+
+    --typo-title-md-size: 16px;
+    --typo-title-md-line-height: 24px;
+    --typo-title-md-weight: 500;
+    --typo-title-md-tracking: 0.15px;
+
+    --typo-title-sm-size: 14px;
+    --typo-title-sm-line-height: 20px;
+    --typo-title-sm-weight: 500;
+    --typo-title-sm-tracking: 0.1px;
+
+    --typo-body-lg-size: 16px;
+    --typo-body-lg-line-height: 24px;
+    --typo-body-lg-weight: 400;
+    --typo-body-lg-tracking: 0.5px;
+
+    --typo-body-md-size: 14px;
+    --typo-body-md-line-height: 20px;
+    --typo-body-md-weight: 400;
+    --typo-body-md-tracking: 0.25px;
+
+    --typo-body-sm-size: 12px;
+    --typo-body-sm-line-height: 16px;
+    --typo-body-sm-weight: 400;
+    --typo-body-sm-tracking: 0.4px;
+
+    --typo-label-lg-size: 14px;
+    --typo-label-lg-line-height: 20px;
+    --typo-label-lg-weight: 500;
+    --typo-label-lg-tracking: 0.1px;
+
+    --typo-label-md-size: 12px;
+    --typo-label-md-line-height: 16px;
+    --typo-label-md-weight: 500;
+    --typo-label-md-tracking: 0.5px;
+
+    --typo-label-sm-size: 11px;
+    --typo-label-sm-line-height: 16px;
+    --typo-label-sm-weight: 500;
+    --typo-label-sm-tracking: 0.5px;
+  }
+
+  /* --- Utility classes --- */
+  .font-family {
+    font-family: var(--font-family);
+  }
+
+  .typo-display {
+    font-size: var(--typo-display-size);
+    line-height: var(--typo-display-line-height);
+    font-weight: var(--typo-display-weight);
+    letter-spacing: var(--typo-display-tracking);
+  }
+  .typo-headline-lg {
+    font-size: var(--typo-headline-lg-size);
+    line-height: var(--typo-headline-lg-line-height);
+    font-weight: var(--typo-headline-lg-weight);
+    letter-spacing: var(--typo-headline-lg-tracking);
+  }
+  .typo-headline-md {
+    font-size: var(--typo-headline-md-size);
+    line-height: var(--typo-headline-md-line-height);
+    font-weight: var(--typo-headline-md-weight);
+    letter-spacing: var(--typo-headline-md-tracking);
+  }
+  .typo-headline-sm {
+    font-size: var(--typo-headline-sm-size);
+    line-height: var(--typo-headline-sm-line-height);
+    font-weight: var(--typo-headline-sm-weight);
+    letter-spacing: var(--typo-headline-sm-tracking);
+  }
+  .typo-title-lg {
+    font-size: var(--typo-title-lg-size);
+    line-height: var(--typo-title-lg-line-height);
+    font-weight: var(--typo-title-lg-weight);
+    letter-spacing: var(--typo-title-lg-tracking);
+  }
+  .typo-title-md {
+    font-size: var(--typo-title-md-size);
+    line-height: var(--typo-title-md-line-height);
+    font-weight: var(--typo-title-md-weight);
+    letter-spacing: var(--typo-title-md-tracking);
+  }
+  .typo-title-sm {
+    font-size: var(--typo-title-sm-size);
+    line-height: var(--typo-title-sm-line-height);
+    font-weight: var(--typo-title-sm-weight);
+    letter-spacing: var(--typo-title-sm-tracking);
+  }
+  .typo-body-lg {
+    font-size: var(--typo-body-lg-size);
+    line-height: var(--typo-body-lg-line-height);
+    font-weight: var(--typo-body-lg-weight);
+    letter-spacing: var(--typo-body-lg-tracking);
+  }
+  .typo-body-md {
+    font-size: var(--typo-body-md-size);
+    line-height: var(--typo-body-md-line-height);
+    font-weight: var(--typo-body-md-weight);
+    letter-spacing: var(--typo-body-md-tracking);
+  }
+  .typo-body-sm {
+    font-size: var(--typo-body-sm-size);
+    line-height: var(--typo-body-sm-line-height);
+    font-weight: var(--typo-body-sm-weight);
+    letter-spacing: var(--typo-body-sm-tracking);
+  }
+  .typo-label-lg {
+    font-size: var(--typo-label-lg-size);
+    line-height: var(--typo-label-lg-line-height);
+    font-weight: var(--typo-label-lg-weight);
+    letter-spacing: var(--typo-label-lg-tracking);
+  }
+  .typo-label-md {
+    font-size: var(--typo-label-md-size);
+    line-height: var(--typo-label-md-line-height);
+    font-weight: var(--typo-label-md-weight);
+    letter-spacing: var(--typo-label-md-tracking);
+  }
+  .typo-label-sm {
+    font-size: var(--typo-label-sm-size);
+    line-height: var(--typo-label-sm-line-height);
+    font-weight: var(--typo-label-sm-weight);
+    letter-spacing: var(--typo-label-sm-tracking);
+  }
+}
