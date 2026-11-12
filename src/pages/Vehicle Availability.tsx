@@ -419,7 +419,14 @@ function App() {
       maxStage={maxStage}
       onStageChange={(s) => goStage(s as Stage)}
     >
-      <main className="availability-content">
+      <button
+        className="mobile-menu fixed left-3 top-3 z-40 lg:hidden"
+        onClick={() => setSidebarOpen(true)}
+        aria-label="Open menu"
+      >
+        <Menu size={20} />
+      </button>
+      <main className="availability-content floating-menu">
         <section className="page-heading">
           <div>
             <div className="title-row">

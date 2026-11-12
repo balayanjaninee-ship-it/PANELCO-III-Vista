@@ -125,7 +125,7 @@ export default function Settings() {
       >
         <span className="text-slate-600">☰</span>
       </button>
-      <main className="dashboard-main">
+      <main className="dashboard-main floating-menu">
         <div className="mb-4 flex gap-2 border-b border-slate-200">
           <button
             className={`flex items-center gap-2 px-4 py-2 typo-label-sm font-semibold transition border-b-2 ${

@@ -476,8 +476,7 @@ export default function App() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-start">
-        <section className="summary-grid flex-1" aria-label="Vehicle operations summary">
+        <section className="summary-grid" aria-label="Vehicle operations summary">
           {summary.map((item) => {
             const Icon = item.icon;
             return (
@@ -513,30 +512,7 @@ export default function App() {
           })}
         </section>
 
-        <article className="panel w-full shrink-0 xl:w-[330px]">
-          <SectionHeader title="Quick Actions" subtitle="Frequently used vehicle operations" />
-          <div className="quick-actions-list">
-            {dashboardActions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <button
-                  className={`quick-action-row ${"primary" in action && action.primary ? "quick-action-primary" : ""}`}
-                  key={action.label}
-                  onClick={() => notify(`${action.label} opened`)}
-                >
-                  <span className="quick-action-icon">
-                    <Icon size={16} />
-                  </span>
-                  <span className="typo-label-sm">{action.label}</span>
-                  <ChevronRight size={13} className="ml-auto opacity-50" />
-                </button>
-              );
-            })}
-          </div>
-        </article>
-        </div>
-
-        <section className="mt-4">
+        <section className="mt-4 grid gap-4 xl:grid-cols-[1fr_330px]">
           <div className="space-y-4 min-w-0">
           <article className="panel min-w-0">
             <SectionHeader
@@ -652,6 +628,28 @@ export default function App() {
             </div>
           </article>
           </div>
+
+          <article className="panel">
+            <SectionHeader title="Quick Actions" subtitle="Frequently used vehicle operations" />
+            <div className="quick-actions-list">
+              {dashboardActions.map((action) => {
+                const Icon = action.icon;
+                return (
+                  <button
+                    className={`quick-action-row ${"primary" in action && action.primary ? "quick-action-primary" : ""}`}
+                    key={action.label}
+                    onClick={() => notify(`${action.label} opened`)}
+                  >
+                    <span className="quick-action-icon">
+                      <Icon size={16} />
+                    </span>
+                    <span className="typo-label-sm">{action.label}</span>
+                    <ChevronRight size={13} className="ml-auto opacity-50" />
+                  </button>
+                );
+              })}
+            </div>
+          </article>
         </section>
 
         <section className="mt-4 grid gap-4 2xl:grid-cols-[1.1fr_.9fr]">

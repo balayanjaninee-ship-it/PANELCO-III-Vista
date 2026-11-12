@@ -722,6 +722,14 @@
   }
 }
 
+/* Pages without a topbar use a floating mobile menu button (fixed top-left);
+   reserve space so it never covers the page heading on small screens. */
+@media (max-width: 1023px) {
+  .floating-menu.floating-menu {
+    padding-top: 56px;
+  }
+}
+
 @media (max-width: 639px) {
   .summary-grid {
     grid-template-columns: 1fr;

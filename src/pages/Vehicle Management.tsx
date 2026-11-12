@@ -893,8 +893,15 @@ export default function VehicleManagement({
 
   return (
     <Layout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
+      <button
+        className="mobile-menu fixed left-3 top-3 z-40 lg:hidden"
+        onClick={() => setSidebarOpen(true)}
+        aria-label="Open menu"
+      >
+        <Icon name="menu" className="size-5" />
+      </button>
       <div className="min-h-screen bg-[#F5F6F3] text-[#202923]">
-        <main className="mx-auto max-w-[1540px] px-4 py-6 sm:px-7 lg:px-9 lg:py-8">
+        <main className="mx-auto max-w-[1540px] px-4 pt-14 pb-6 sm:px-7 lg:px-9 lg:py-8">
           <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
             <div>
               <h1 className="typo-headline-sm leading-1.2 tracking-[-.035em] text-slate-900">

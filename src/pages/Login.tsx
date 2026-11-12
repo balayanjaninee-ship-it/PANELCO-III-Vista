@@ -278,7 +278,6 @@ export default function App() {
                         id="username"
                         name="username"
                         autoComplete="username"
-                        defaultValue={mode === "signin" ? "123" : "345"}
                         required
                         placeholder="Enter your username"
                         className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-4 typo-body-sm text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
@@ -302,7 +301,6 @@ export default function App() {
                         name="password"
                         type={showPassword ? "text" : "password"}
                         autoComplete="current-password"
-                        defaultValue="12345"
                         required
                         placeholder="Enter your password"
                         className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-12 typo-body-sm text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"

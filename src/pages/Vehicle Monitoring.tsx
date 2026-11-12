@@ -105,7 +105,7 @@ export default function VehicleMonitoring() {
       >
         <span className="text-slate-600">☰</span>
       </button>
-      <main className="dashboard-main">
+      <main className="dashboard-main floating-menu">
         <section className="grid gap-4 xl:grid-cols-[1fr_330px]">
           <article className="panel min-w-0">
             <SectionHeader
