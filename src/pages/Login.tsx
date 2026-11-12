@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logoImg from "../panelco 3 logo.png";
 import vehiclePhoto from "../Grab-2.jpg";
 import "../styles/typography.css";
-import { useAuth, UserRole } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 <img src={vehiclePhoto} alt="PANELCO Vehicle" />
 
@@ -13,7 +13,7 @@ function Logo() {
       <img
         src={logoImg}
         alt="PANELCO III logo"
-        className="-ml-8 -mr-8 h-32 w-auto object-contain mix-blend-multiply"
+        className="-ml-6 -mr-6 h-16 w-auto object-contain mix-blend-multiply sm:h-28 lg:h-32"
       />
       <div className="flex flex-col justify-center">
         <p className="typo-label-sm text-[#0d3448] uppercase tracking-[0.18em] sm:text-[14px]">
@@ -69,8 +69,9 @@ function Icon({ name }: { name: "user" | "lock" | "eye" | "eye-off" }) {
 export default function App() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const [mode, setMode] = useState<"signin" | "request">("signin");
-  const [userRole, setUserRole] = useState<UserRole>("Administrator");
+
   const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -78,20 +79,29 @@ export default function App() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoginError("");
+    const username = (document.getElementById("username") as HTMLInputElement).value;
+    const password = (document.getElementById("password") as HTMLInputElement).value;
+
     if (mode === "signin") {
-      const ok = login(
-        (document.getElementById("username") as HTMLInputElement).value,
-        (document.getElementById("password") as HTMLInputElement).value,
-        userRole,
-      );
+      // Admin sign-in: authenticate, then go straight to the dashboard.
+      const ok = login(username, password, "Administrator");
       if (ok) {
         navigate("/dashboard");
+        return;
       } else {
         setLoginError("Invalid username, password, or role selection.");
       }
       return;
     }
-    setSubmitted(true);
+
+    // User sign-in: authenticate, then force a password change on first login.
+    const ok = login(username, password, "Personnel");
+    if (ok) {
+      setShowChangePassword(true);
+      return;
+    } else {
+      setLoginError("Invalid username, password, or role selection.");
+    }
   }
 
   function changeMode(nextMode: "signin" | "request") {
@@ -101,50 +111,30 @@ export default function App() {
   }
 
   return (
-    <main className="login-canvas min-h-screen overflow-y-auto px-4 py-7 text-[#112f3d] sm:px-7 sm:py-10 lg:flex lg:justify-center lg:px-12">
-      <div className="login-card mx-auto my-auto grid w-full max-w-[1100px] overflow-hidden rounded-[28px] bg-white shadow-[0_28px_70px_rgba(28,53,66,.22)] lg:min-h-[calc(100vh-9rem)] lg:grid-cols-[52%_48%]">
-        <section className="flex flex-col px-7 py-7 sm:px-12 sm:py-10 lg:min-h-0 lg:px-16 lg:py-10 xl:px-[78px]" style={{ zoom: 0.8 }}>
+    <main className="login-canvas h-screen overflow-hidden px-4 py-1 text-[#112f3d] sm:px-7 sm:py-4 flex items-center justify-center lg:px-12">
+      <div className="login-card mx-auto grid w-full max-w-[1100px] overflow-hidden rounded-[28px] bg-white shadow-[0_28px_70px_rgba(28,53,66,.22)] lg:min-h-[calc(100vh-6rem)] lg:grid-cols-[52%_48%]">
+        <section className="flex flex-col px-5 py-1 sm:px-12 sm:py-4 lg:min-h-0 lg:px-16 lg:py-10 xl:px-[78px]">
           <header>
             <Logo />
           </header>
 
-          <div className="flex flex-1 items-center py-10 lg:py-6">
+          <div className="flex flex-1 items-center py-2 lg:py-6">
             <div className="w-full max-w-[440px]">
-              <div className="mb-6">
+              <div className="mb-1">
                 
                 <h1 className="typo-headline-sm text-[#102e3d] leading-[1.08] tracking-[-0.045em] sm:text-[2.4rem]">
-                  {mode === "signin" ? "Welcome back." : "Create an account."}
+                  Welcome back.
                   <br />
                   <span className="text-[#F5C518]">
-                    {mode === "signin" ? "Sign in" : "Sign up"}
+                    Sign in
                   </span>{" "}
-                  {mode === "signin" ? "to continue." : "today."}
+                  to continue.
                 </h1>
                 
               </div>
 
-              {mode === "signin" && (
-                <div className="mb-4">
-                  <label
-                    htmlFor="user-role"
-                    className="mb-2 block typo-label-sm text-[#24434f]"
-                  >
-                    Account Role
-                  </label>
-                  <select
-                    id="user-role"
-                    value={userRole}
-                    onChange={(e) => setUserRole(e.target.value as UserRole)}
-                    className="h-[44px] w-full rounded-lg border border-[#dfe3dc] bg-white px-3 typo-label-sm text-[#202923] outline-none transition focus:border-[#176B3A]"
-                  >
-                    <option value="Administrator">Administrator</option>
-                    <option value="Personnel">Personnel</option>
-                  </select>
-                </div>
-              )}
-
               <div
-                className="mb-6 grid grid-cols-2 rounded-[14px] bg-[#eef3f3] p-1.5"
+                className="mb-1 grid grid-cols-2 rounded-[14px] bg-[#eef3f3] p-1.5"
                 role="tablist"
                 aria-label="Account access options"
               >
@@ -159,7 +149,7 @@ export default function App() {
                       : "text-[#71858c] hover:text-[#254a57]"
                   }`}
                 >
-                  Sign In
+                  Admin
                 </button>
                 <button
                   type="button"
@@ -172,56 +162,151 @@ export default function App() {
                       : "text-[#71858c] hover:text-[#254a57]"
                   }`}
                 >
-                  Sign Up
+                  User
                 </button>
               </div>
 
-              <form className="space-y-4" onSubmit={handleSubmit}>
-                <div>
-                  <label
-                    htmlFor="username"
-                    className="mb-2 block typo-label-sm text-[#24434f]"
-                  >
-                    {mode === "signin" ? "Username" : "ID Number"}
-                  </label>
-                  <div className="group relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9aabb0] transition group-focus-within:text-[#168f78]">
-                      <Icon name="user" />
-                    </span>
-                    <input
-                      id="username"
-                      name="username"
-                      autoComplete="username"
-                      required
-                      placeholder={
-                        mode === "signin" ? "Enter your username" : "Enter your ID number"
-                      }
-                      className="h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-4 typo-body-sm text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
-                    />
-                  </div>
-                </div>
+              <p className="mb-1 typo-label-sm leading-5 text-[#6b8086] text-center">
+                Note: Your username is your ID number. Default password is
+                <span className="font-semibold text-[#102e3d]"> 12345</span>. You
+                will be asked to change it after signing in.
+              </p>
 
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="mb-2 block typo-label-sm text-[#24434f]"
+              {showChangePassword ? (
+                <div className="space-y-2">
+                  <div>
+                    <label
+                      htmlFor="new-password"
+                      className="mb-1 block typo-label-sm text-[#24434f]"
+                    >
+                      New Password
+                    </label>
+                    <div className="group relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9aabb0] transition group-focus-within:text-[#168f78]">
+                        <Icon name="lock" />
+                      </span>
+                      <input
+                        id="new-password"
+                        name="newPassword"
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="new-password"
+                        required
+                        placeholder="Enter your new password"
+                        className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-12 typo-body-sm text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="confirm-password"
+                      className="mb-1 block typo-label-sm text-[#24434f]"
+                    >
+                      Confirm Password
+                    </label>
+                    <div className="group relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9aabb0] transition group-focus-within:text-[#168f78]">
+                        <Icon name="lock" />
+                      </span>
+                      <input
+                        id="confirm-password"
+                        name="confirmPassword"
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="new-password"
+                        required
+                        placeholder="Confirm your new password"
+                        className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-12 typo-body-sm text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
+                      />
+                    </div>
+                  </div>
+
+                  {loginError && (
+                    <p className="typo-label-sm text-red-600 text-center">
+                      {loginError}
+                    </p>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newPassword = (
+                        document.getElementById("new-password") as HTMLInputElement
+                      ).value;
+                      const confirmPassword = (
+                        document.getElementById("confirm-password") as HTMLInputElement
+                      ).value;
+                      if (!newPassword || newPassword !== confirmPassword) {
+                        setLoginError("Passwords do not match.");
+                        return;
+                      }
+                      setLoginError("");
+                      navigate("/dashboard");
+                    }}
+                    className="mt-2 h-[40px] sm:h-[44px] w-full rounded-lg bg-[#176B3A] typo-label-sm text-white shadow-[0_2px_4px_rgba(23,107,58,.3)] transition colors-200 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#168f78] hover:bg-[#F5C518] active:bg-[#F5C518] active:text-[color:var(--panelco-white)] active:shadow-[0_2px_4px_rgba(245,197,24,.3)]"
                   >
-                    {mode === "signin" ? "Password" : "Company Email"}
-                  </label>
-                  <div className="group relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9aabb0] transition group-focus-within:text-[#168f78]">
-                      <Icon name="lock" />
-                    </span>
-                    <input
-                      id="password"
-                      name="password"
-                      type={mode === "signin" ? (showPassword ? "text" : "password") : "email"}
-                      autoComplete={mode === "signin" ? "current-password" : "email"}
-                      required
-                      placeholder={mode === "signin" ? "Enter your password" : "name@panelco3.com"}
-                      className="h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-12 typo-body-sm text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
-                    />
-                    {mode === "signin" && (
+                    Update Password
+                  </button>
+
+                  <p className="text-center typo-label-sm leading-5 text-[#6b8086] mt-2">
+                    Already changed your password?{" "}
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowChangePassword(false);
+                      }}
+                      className="text-[#16816d] underline-offset-4 transition hover:underline"
+                    >
+                      Sign in again
+                    </a>
+                  </p>
+                </div>
+              ) : (
+                <form className="space-y-2" onSubmit={handleSubmit}>
+                  <div>
+                    <label
+                      htmlFor="username"
+                      className="mb-1 block typo-label-sm text-[#24434f]"
+                    >
+                      Username
+                    </label>
+                    <div className="group relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9aabb0] transition group-focus-within:text-[#168f78]">
+                        <Icon name="user" />
+                      </span>
+                      <input
+                        id="username"
+                        name="username"
+                        autoComplete="username"
+                        defaultValue={mode === "signin" ? "123" : "345"}
+                        required
+                        placeholder="Enter your username"
+                        className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-4 typo-body-sm text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="password"
+                      className="mb-1 block typo-label-sm text-[#24434f]"
+                    >
+                      Password
+                    </label>
+                    <div className="group relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9aabb0] transition group-focus-within:text-[#168f78]">
+                        <Icon name="lock" />
+                      </span>
+                      <input
+                        id="password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="current-password"
+                        defaultValue="12345"
+                        required
+                        placeholder="Enter your password"
+                        className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-12 typo-body-sm text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
+                      />
                       <button
                         type="button"
                         onClick={() => setShowPassword((value) => !value)}
@@ -230,17 +315,15 @@ export default function App() {
                       >
                         <Icon name={showPassword ? "eye-off" : "eye"} />
                       </button>
-                    )}
+                    </div>
                   </div>
-                </div>
 
-                {loginError && (
-                  <p className="typo-label-sm text-red-600 text-center">
-                    {loginError}
-                  </p>
-                )}
+                  {loginError && (
+                    <p className="typo-label-sm text-red-600 text-center">
+                      {loginError}
+                    </p>
+                  )}
 
-                {mode === "signin" ? (
                   <div className="flex h-5 items-center justify-between gap-4 typo-label-sm">
                     <label className="flex cursor-pointer items-center gap-2.5 text-[#6c8087]">
                       <input
@@ -257,41 +340,34 @@ export default function App() {
                       Forgot Password?
                     </a>
                   </div>
-                ) : (
-                  <p className="flex h-5 items-center gap-2 typo-label-sm leading-5 text-[#6b8086]">
-                    <span className="size-1.5 shrink-0 rounded-full bg-[#25a68f]" />
-                    Complete your personal information after your first login.
-                  </p>
-                )}
 
-                <button
-                  type="submit"
-                  className="mt-2 h-[44px] w-full rounded-lg bg-[#176B3A] typo-label-sm text-white shadow-[0_2px_4px_rgba(23,107,58,.3)] transition colors-200 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#168f78] hover:bg-[#F5C518] active:bg-[#F5C518] active:text-[color:var(--panelco-white)] active:shadow-[0_2px_4px_rgba(245,197,24,.3)]"
-                >
-                  {mode === "signin" ? "Sign In" : "Sign Up"}
-                </button>
-
-                {submitted && (
-                  <p
-                    role="status"
-                    className="rounded-lg border border-[#cde7e1] bg-[#eff8f6] px-4 py-3 typo-label-sm leading-5 text-[#176653]"
+                  <button
+                    type="submit"
+                    className="mt-2 h-[40px] sm:h-[44px] w-full rounded-lg bg-[#176B3A] typo-label-sm text-white shadow-[0_2px_4px_rgba(23,107,58,.3)] transition colors-200 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#168f78] hover:bg-[#F5C518] active:bg-[#F5C518] active:text-[color:var(--panelco-white)] active:shadow-[0_2px_4px_rgba(245,197,24,.3)]"
                   >
-                    {mode === "signin"
-                      ? "Demo sign-in submitted. Connect the company authentication service to continue."
-                      : "Account details received. You can finish setting up your profile after signing in."}
-                  </p>
-                )}
-              </form>
+                    Sign In
+                  </button>
+
+                  {submitted && (
+                    <p
+                      role="status"
+                      className="rounded-lg border border-[#cde7e1] bg-[#eff8f6] px-4 py-3 typo-label-sm leading-5 text-[#176653]"
+                    >
+                      Demo sign-in submitted. Connect the company authentication service to continue.
+                    </p>
+                  )}
+                </form>
+              )}
             </div>
           </div>
-          <footer className="flex flex-col gap-2 border-t border-[#e9eff0] pt-5 typo-label-sm leading-4 text-[#8b9ba0] sm:flex-row sm:items-center sm:justify-between">
+          <footer className="hidden sm:flex flex-col gap-1 border-t border-[#e9eff0] pt-2 typo-label-sm leading-4 text-[#8b9ba0] sm:flex-row sm:items-center sm:justify-between">
             <span>© 2026 PANELCO III. All Rights Reserved.</span>
             <span className="flex items-center gap-1.5">
             </span>
           </footer>
         </section>
 
-        <section className="relative order-first m-3 min-h-[250px] overflow-hidden rounded-[20px] bg-[#143d4d] shadow-[0_18px_34px_rgba(13,52,66,.2)] sm:m-4 sm:min-h-[330px] lg:order-none lg:m-5 lg:ml-0 lg:min-h-0">
+        <section className="relative order-first m-1 min-h-[80px] overflow-hidden rounded-[20px] bg-[#143d4d] shadow-[0_18px_34px_rgba(13,52,66,.2)] sm:m-4 sm:min-h-[160px] lg:order-none lg:m-5 lg:ml-0 lg:min-h-0 hidden sm:block">
           <img
             src={vehiclePhoto}
             alt="A company utility pickup truck ready for service"

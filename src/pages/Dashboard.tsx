@@ -435,7 +435,7 @@ export default function App() {
                 <button className="dropdown-item">
                   <UserRound size={15} /> My profile
                 </button>
-                <button className="dropdown-item">
+                <button className="dropdown-item" onClick={() => navigate("/settings")}>
                   <Settings size={15} /> Account settings
                 </button>
                 <button
@@ -476,7 +476,8 @@ export default function App() {
           </p>
         </div>
 
-        <section className="summary-grid" aria-label="Vehicle operations summary">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-start">
+        <section className="summary-grid flex-1" aria-label="Vehicle operations summary">
           {summary.map((item) => {
             const Icon = item.icon;
             return (
@@ -512,88 +513,31 @@ export default function App() {
           })}
         </section>
 
-        <section className="mt-4 grid gap-4 xl:grid-cols-[1fr_330px]">
-          <article className="panel min-w-0">
-            <SectionHeader
-              title="Upcoming Schedules"
-              subtitle={
-                userRole === "Personnel"
-                  ? "Your upcoming vehicle schedules"
-                  : "Approved vehicle schedules that have not yet departed"
-              }
-              link="View All Schedules"
-              onLink={() => navigate("/vehicle-availability")}
-            />
-            <div className="table-scroll">
-              <table className="data-table min-w-[760px]">
-                <thead>
-                  <tr>
-                    <th>Vehicle</th>
-                    <th>Plate Number</th>
-                    <th>Driver</th>
-                    <th>Department</th>
-                    <th>Schedule Date</th>
-                    <th>Expected Return</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {upcomingSchedules.map((item) => (
-                    <tr key={item.plate + item.scheduleDate}>
-                      <td>
-                        <div className="flex items-center gap-2.5">
-                          <span className="vehicle-icon">
-                            <CarFront size={16} />
-                          </span>
-                          <b className="typo-label-sm">{item.vehicle}</b>
-                        </div>
-                      </td>
-                      <td className="typo-label-sm">{item.plate}</td>
-                      <td className="typo-label-sm">{item.driver}</td>
-                      <td className="typo-label-sm">{item.department}</td>
-                      <td className="typo-label-sm">{item.scheduleDate}</td>
-                      <td className="typo-label-sm">{item.expectedReturn}</td>
-                      <td>
-                        <StatusBadge status={item.status as any} />
-                      </td>
-                    </tr>
-                  ))}
-                  {upcomingSchedules.length === 0 && (
-                    <tr>
-                      <td colSpan={7} className="!py-8 text-center text-slate-400">
-                        No upcoming schedules.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </article>
+        <article className="panel w-full shrink-0 xl:w-[330px]">
+          <SectionHeader title="Quick Actions" subtitle="Frequently used vehicle operations" />
+          <div className="quick-actions-list">
+            {dashboardActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <button
+                  className={`quick-action-row ${"primary" in action && action.primary ? "quick-action-primary" : ""}`}
+                  key={action.label}
+                  onClick={() => notify(`${action.label} opened`)}
+                >
+                  <span className="quick-action-icon">
+                    <Icon size={16} />
+                  </span>
+                  <span className="typo-label-sm">{action.label}</span>
+                  <ChevronRight size={13} className="ml-auto opacity-50" />
+                </button>
+              );
+            })}
+          </div>
+        </article>
+        </div>
 
-          <article className="panel">
-            <SectionHeader title="Quick Actions" subtitle="Frequently used vehicle operations" />
-            <div className="quick-actions-list">
-              {dashboardActions.map((action) => {
-                const Icon = action.icon;
-                return (
-                  <button
-                    className={`quick-action-row ${"primary" in action && action.primary ? "quick-action-primary" : ""}`}
-                    key={action.label}
-                    onClick={() => notify(`${action.label} opened`)}
-                  >
-                    <span className="quick-action-icon">
-                      <Icon size={16} />
-                    </span>
-                    <span className="typo-label-sm">{action.label}</span>
-                    <ChevronRight size={13} className="ml-auto opacity-50" />
-                  </button>
-                );
-              })}
-            </div>
-          </article>
-        </section>
-
-        <section className="mt-4 grid gap-4 2xl:grid-cols-[1.1fr_.9fr]">
+        <section className="mt-4">
+          <div className="space-y-4 min-w-0">
           <article className="panel min-w-0">
             <SectionHeader
               title="Active Vehicle Trips"
@@ -651,6 +595,66 @@ export default function App() {
             </div>
           </article>
 
+          <article className="panel min-w-0">
+            <SectionHeader
+              title="Upcoming Schedules"
+              subtitle={
+                userRole === "Personnel"
+                  ? "Your upcoming vehicle schedules"
+                  : "Approved vehicle schedules that have not yet departed"
+              }
+              link="View All Schedules"
+              onLink={() => navigate("/vehicle-monitoring")}
+            />
+            <div className="table-scroll">
+              <table className="data-table min-w-[760px]">
+                <thead>
+                  <tr>
+                    <th>Vehicle</th>
+                    <th>Plate Number</th>
+                    <th>Driver</th>
+                    <th>Department</th>
+                    <th>Schedule Date</th>
+                    <th>Expected Return</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {upcomingSchedules.map((item) => (
+                    <tr key={item.plate + item.scheduleDate}>
+                      <td>
+                        <div className="flex items-center gap-2.5">
+                          <span className="vehicle-icon">
+                            <CarFront size={16} />
+                          </span>
+                          <b className="typo-label-sm">{item.vehicle}</b>
+                        </div>
+                      </td>
+                      <td className="typo-label-sm">{item.plate}</td>
+                      <td className="typo-label-sm">{item.driver}</td>
+                      <td className="typo-label-sm">{item.department}</td>
+                      <td className="typo-label-sm">{item.scheduleDate}</td>
+                      <td className="typo-label-sm">{item.expectedReturn}</td>
+                      <td>
+                        <StatusBadge status={item.status as any} />
+                      </td>
+                    </tr>
+                  ))}
+                  {upcomingSchedules.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="!py-8 text-center text-slate-400">
+                        No upcoming schedules.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </article>
+          </div>
+        </section>
+
+        <section className="mt-4 grid gap-4 2xl:grid-cols-[1.1fr_.9fr]">
           <article className="panel">
             <SectionHeader title="Pending Tasks & Notifications" subtitle="Items requiring attention" />
             <div className="space-y-2">

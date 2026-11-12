@@ -18,7 +18,7 @@ export default function Layout({
   onStageChange?: (stage: number) => void;
 }) {
   return (
-    <div className="min-h-screen bg-[#f5f7fb] text-slate-700">
+    <div className="min-h-screen bg-[#f5f7fb] text-slate-700" style={{ "--sidebar-width": "248px" }}>
       <Sidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -26,7 +26,7 @@ export default function Layout({
         maxStage={maxStage}
         onStageChange={onStageChange}
       />
-      <div className="lg:pl-[248px]">{children}</div>
+      <div className="lg:pl-[var(--sidebar-width)]">{children}</div>
     </div>
   );
 }

@@ -8,6 +8,12 @@ export interface AuthUser {
   fullName: string;
   role: UserRole;
   email?: string;
+  employeeId?: string;
+  department?: string;
+  position?: string;
+  contactNumber?: string;
+  lastPasswordChange?: string;
+  lastLogin?: string;
 }
 
 interface AuthContextType {
@@ -16,30 +22,43 @@ interface AuthContextType {
   login: (username: string, password: string, role: UserRole) => boolean;
   logout: () => void;
   hasAccess: (path: string) => boolean;
+  updateUser: (updates: Partial<AuthUser>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Mock users for testing — replace with real authentication later
 const MOCK_USERS: Record<string, { password: string; user: AuthUser }> = {
-  admin: {
-    password: "admin123",
+  "123": {
+    password: "12345",
     user: {
       id: "1",
-      username: "admin",
-      fullName: "Janine Balayan",
+      username: "123",
+      fullName: "Admin User",
       role: "Administrator",
       email: "admin@panelco3.com",
+      employeeId: "EMP-001",
+      department: "General Services",
+      position: "Administrator",
+      contactNumber: "0917-123-4567",
+      lastPasswordChange: "Jan 15, 2026",
+      lastLogin: "Nov 12, 2026, 9:42 AM",
     },
   },
-  personnel: {
-    password: "personnel123",
+  "345": {
+    password: "12345",
     user: {
       id: "2",
-      username: "personnel",
+      username: "345",
       fullName: "Personnel User",
       role: "Personnel",
-      email: "personnel@panelco3.com",
+      email: "user@panelco3.com",
+      employeeId: "EMP-002",
+      department: "Operations",
+      position: "Personnel",
+      contactNumber: "0917-345-6789",
+      lastPasswordChange: "Oct 3, 2026",
+      lastLogin: "Nov 12, 2026, 10:15 AM",
     },
   },
 };
@@ -71,7 +90,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!record) return false;
       if (record.password !== password) return false;
       if (record.user.role !== role) return false;
-      setUser(record.user);
+      const now = new Date();
+      const lastLogin = now.toLocaleString("en-PH", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      setUser({ ...record.user, lastLogin });
       return true;
     },
     [],
@@ -79,6 +106,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     setUser(null);
+  }, []);
+
+  const updateUser = useCallback((updates: Partial<AuthUser>) => {
+    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
   }, []);
 
   const hasAccess = useCallback(
@@ -96,6 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     hasAccess,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
