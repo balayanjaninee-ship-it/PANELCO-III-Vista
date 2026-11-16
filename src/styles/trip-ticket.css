@@ -1,0 +1,440 @@
+/* ============================================================
+   Daily Driver's Trip Ticket — drawn form (no scanned image)
+   ============================================================ */
+
+.trip-ticket-form {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background: #fff;
+  container-type: inline-size;
+  font-family: "Times New Roman", Times, serif;
+}
+
+/* A4 aspect ratio placeholder so the form keeps proportions on screen */
+.trip-ticket-form::before {
+  content: "";
+  display: block;
+  width: 100%;
+  padding-bottom: 141.4%; /* A4 ratio (297/210) */
+}
+
+/* Inner drawing surface — all absolute positions map to this */
+.trip-ticket-surface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 12mm 14mm;
+  box-sizing: border-box;
+}
+
+/* ---------- Letterhead ---------- */
+.tt-letterhead {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 2.5px solid #1a3a5c;
+  margin-bottom: 6px;
+}
+
+.tt-brand-mark {
+  width: 26px;
+  height: 26px;
+  border: 2px solid #1a3a5c;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 16px;
+  color: #1a3a5c;
+  font-family: Arial, sans-serif;
+}
+
+.tt-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.tt-coop {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #000;
+  line-height: 1.15;
+}
+
+.tt-sub {
+  font-size: 8.5px;
+  color: #334155;
+  letter-spacing: 0.3px;
+  line-height: 1.1;
+}
+
+/* ---------- Title ---------- */
+.tt-title {
+  position: absolute;
+  top: 44px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ---------- Sections ---------- */
+.tt-section {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+
+.tt-info {
+  top: 78px;
+}
+
+.tt-fuel {
+  top: 132px;
+}
+
+.tt-signatures {
+  top: 340px;
+}
+
+/* ---------- Info rows ---------- */
+.tt-field-row {
+  position: relative;
+  height: 22px;
+  margin-bottom: 6px;
+}
+
+.tt-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 9.5px;
+  color: #000;
+  white-space: nowrap;
+}
+
+.tt-label-right {
+  left: auto;
+  right: 0;
+}
+
+/* ---------- Fuel block ---------- */
+.tt-fuel-header {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.tt-fuel-table {
+  position: absolute;
+  left: 0;
+  top: 16px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tt-fuel-row {
+  display: grid;
+  grid-template-columns: 10% 28% 18% 18% 16% 10%;
+  gap: 0;
+  height: 18px;
+  border-bottom: 0.6px solid #000;
+}
+
+.tt-fuel-row.tt-fuel-head {
+  border-top: 1px solid #000;
+  border-bottom: 1.4px solid #000;
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  align-items: center;
+  padding: 2px 0;
+}
+
+.tt-fuel-col {
+  display: flex;
+  align-items: center;
+  padding: 0 3px;
+  font-size: 8.5px;
+  color: #000;
+  white-space: nowrap;
+}
+
+.tt-fuel-col.c1 { grid-column: 1; }
+.tt-fuel-col.c2 { grid-column: 2; }
+.tt-fuel-col.c3 { grid-column: 3; }
+
+.tt-checkbox {
+  width: 10px;
+  height: 10px;
+  accent-color: #000;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- Trip table ---------- */
+.tt-trip-table {
+  position: absolute;
+  left: 58%;
+  top: 108px;
+  width: 40%;
+  border-collapse: collapse;
+}
+
+.tt-trip-row {
+  display: grid;
+  grid-template-columns: 22% 38% 40%;
+  gap: 0;
+  height: 20px;
+  border-bottom: 0.6px solid #000;
+}
+
+.tt-trip-row.tt-trip-head {
+  border-top: 1px solid #000;
+  border-bottom: 1.4px solid #000;
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  align-items: center;
+  padding: 2px 0;
+}
+
+.tt-trip-col {
+  display: flex;
+  align-items: center;
+  padding: 0 3px;
+  font-size: 8.5px;
+  color: #000;
+  white-space: nowrap;
+}
+
+.tt-trip-col.c1 { grid-column: 1; }
+.tt-trip-col.c2 { grid-column: 2; }
+.tt-trip-col.c3 { grid-column: 3; }
+
+.tt-conforme-row {
+  position: absolute;
+  left: 58%;
+  top: 156px;
+  width: 40%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+}
+
+.tt-label-small {
+  font-size: 9px;
+  color: #000;
+  white-space: nowrap;
+}
+
+/* ---------- Signatures ---------- */
+.tt-sig-row {
+  position: relative;
+  height: 78px;
+  display: flex;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.tt-sig-cell {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tt-sig {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid #000;
+  background: transparent;
+  font-size: 10px;
+  font-family: "Times New Roman", Times, serif;
+  padding: 0;
+  margin: 0;
+  outline: none;
+}
+
+.tt-sig-caption {
+  margin-top: 4px;
+  font-size: 7.5px;
+  color: #334155;
+  text-align: center;
+  line-height: 1.1;
+}
+
+/* ---------- Gate Pass ---------- */
+.tt-gp-divider {
+  position: absolute;
+  top: 432px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #334155;
+  padding-top: 4px;
+  border-top: 1px solid #999;
+  margin-top: 6px;
+}
+
+.tt-gatepass {
+  top: 452px;
+  height: 148px;
+  border: 1px solid #000;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}
+
+.tt-gp1 { left: 0; width: 49%; }
+.tt-gp2 { left: 51%; width: 49%; }
+
+.tt-gp-title {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #000;
+  padding-bottom: 3px;
+}
+
+.tt-gp-grid {
+  position: relative;
+  height: 96px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 6px;
+}
+
+.tt-gp-cell {
+  position: relative;
+  height: 14px;
+  font-size: 7.5px;
+}
+
+.tt-gp-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 7.5px;
+  color: #000;
+  white-space: nowrap;
+}
+
+.tt-small {
+  font-size: 7.5px;
+  height: 10px;
+}
+
+.tt-tight {
+  font-size: 8px;
+  padding: 0 1px;
+}
+
+.tt-gp-sigs {
+  position: relative;
+  height: 32px;
+  margin-top: 4px;
+  display: flex;
+  gap: 6px;
+}
+
+.tt-gp-sig-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.tt-sig-caption-small {
+  margin-top: 2px;
+  font-size: 6.5px;
+  color: #334155;
+  text-align: center;
+  line-height: 1;
+}
+
+/* ---------- Fillable fields (absolute overlays) ---------- */
+.tt-field {
+  position: absolute;
+  z-index: 2;
+  margin: 0;
+  padding: 0 1px;
+  border: none;
+  background: transparent;
+  color: #000;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 11px;
+  font-size: max(11px, 1.39cqw);
+  line-height: 1;
+  outline: none;
+}
+
+.tt-field.tt-underline {
+  border-bottom: 1px solid #000;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+.tt-field:focus {
+  background: rgba(255, 235, 59, 0.4);
+}
+
+input[type="checkbox"].tt-field {
+  padding: 0;
+  accent-color: #000;
+}
+
+/* ---------- Print ---------- */
+@media print {
+  .trip-ticket-form {
+    box-shadow: none;
+    width: 100%;
+    max-width: 100%;
+  }
+  .trip-ticket-form::before {
+    display: none;
+  }
+  .trip-ticket-surface {
+    position: static;
+    width: 100%;
+    height: auto;
+    padding: 0;
+  }
+  .tt-field {
+    background: transparent !important;
+  }
+  .tt-field:focus {
+    background: transparent !important;
+  }
+  body {
+    background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

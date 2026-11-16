@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
+import TripTicketForm from "../components/TripTicketForm";
 import { Menu } from "lucide-react";
 import "../styles/vehicle availability.css";
 import "../styles/dashboard.css";
@@ -1580,6 +1581,26 @@ function DocumentModal({
   onComplete: () => void;
 }) {
   const doc = documentData[index];
+
+  // Seed the Daily Driver's Trip Ticket paper form with the trip data so it
+  // fills in the blanks on the actual printed form.
+  useEffect(() => {
+    if (index === 0) {
+      const defaults: Record<string, string> = {
+        driver_name: "Roberto A. Santos",
+        vehicle: "Toyota Hilux · NBO 4831",
+        destination: "Urdaneta City Substation",
+        purpose: "Routine inspection",
+        date: "June 18, 2025 · 7:30 AM",
+      };
+      for (const [key, value] of Object.entries(defaults)) {
+        if (!localStorage.getItem("ddtt_" + key)) {
+          localStorage.setItem("ddtt_" + key, value);
+        }
+      }
+    }
+  }, [index]);
+
   return (
     <div className="modal-backdrop" onMouseDown={onClose}>
       <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
@@ -1596,30 +1617,12 @@ function DocumentModal({
           </button>
         </div>
         <div className="modal-body">
-          {index === 0 && (
-            <div className="modal-form-grid">
-              <Field label="Driver's name">
-                <input defaultValue="Roberto A. Santos" />
-              </Field>
-              <Field label="Vehicle">
-                <input defaultValue="Toyota Hilux · NBO 4831" />
-              </Field>
-              <Field label="Destination">
-                <input defaultValue="Urdaneta City Substation" />
-              </Field>
-              <Field label="Trip purpose">
-                <input defaultValue="Routine inspection" />
-              </Field>
-              <Field label="Departure schedule">
-                <input defaultValue="June 18, 2025 · 7:30 AM" />
-              </Field>
-              <Field label="Expected return">
-                <input defaultValue="June 18, 2025 · 5:00 PM" />
-              </Field>
-            </div>
-          )}
-          {index === 2 && (
-            <div className="checklist">
+          {index === 0 ? (
+            <TripTicketForm />
+          ) : (
+            <>
+              {index === 2 && (
+                <div className="checklist">
               {[
                 "Tire condition and pressure",
                 "Brakes and parking brake",
@@ -1692,6 +1695,8 @@ function DocumentModal({
             </span>
             <p>I certify that the information provided is complete and accurate.</p>
           </label>
+            </>
+          )}
         </div>
         <div className="modal-footer">
           <button className="secondary-button" onClick={onClose}>
@@ -1718,7 +1723,10 @@ function PreviewModal({
   const isCombinedSheet = index < 2;
   return (
     <div className="modal-backdrop" onMouseDown={onClose}>
-      <div className="modal preview-modal" onMouseDown={(e) => e.stopPropagation()}>
+      <div
+        className={`modal preview-modal${isCombinedSheet ? " with-form" : ""}`}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <div className="document-icon blue">
             <Icon name="eye" />
@@ -1735,55 +1743,41 @@ function PreviewModal({
             <Icon name="x" />
           </button>
         </div>
-        <div className="paper-preview">
-          <div className="paper-brand">
-            <div className="brand-mark mini">
-              <span>P</span>
-            </div>
-            <div>
-              <strong>PANGASINAN III ELECTRIC COOPERATIVE</strong>
-              <span>PANELCO III · VehicleHub</span>
-            </div>
-            <small>VH-2025-0618-024</small>
-          </div>
-          <h2>
-            {isCombinedSheet
-              ? "DAILY DRIVER'S TRIP TICKET"
-              : documentData[index].title.toUpperCase()}
-          </h2>
-          <div className="preview-lines">
-            {Array.from({ length: isCombinedSheet ? 4 : 9 }, (_, i) => (
-              <div key={i}>
-                <span />
-                <span />
-              </div>
-            ))}
-          </div>
-          {isCombinedSheet && (
+        <div className={`paper-preview${isCombinedSheet ? " with-form" : ""}`}>
+          {isCombinedSheet ? (
+            <TripTicketForm />
+          ) : (
             <>
-              <div className="combined-document-divider">
-                <span>SAME PRINTED SHEET</span>
-                <h2>GATE PASS</h2>
+              <div className="paper-brand">
+                <div className="brand-mark mini">
+                  <span>P</span>
+                </div>
+                <div>
+                  <strong>PANGASINAN III ELECTRIC COOPERATIVE</strong>
+                  <span>PANELCO III · VehicleHub</span>
+                </div>
+                <small>VH-2025-0618-024</small>
               </div>
-              <div className="preview-lines compact">
-                {Array.from({ length: 4 }, (_, i) => (
+              <h2>{documentData[index].title.toUpperCase()}</h2>
+              <div className="preview-lines">
+                {Array.from({ length: 9 }, (_, i) => (
                   <div key={i}>
                     <span />
                     <span />
                   </div>
                 ))}
               </div>
+              <div className="signature-lines">
+                {signatories.map((signer, signerIndex) => (
+                  <span key={`${signer.name}-${signerIndex}`}>
+                    <b>&nbsp;</b>
+                    {signer.name}
+                    <small>{signer.position} · Date: __________________</small>
+                  </span>
+                ))}
+              </div>
             </>
           )}
-          <div className="signature-lines">
-            {signatories.map((signer, signerIndex) => (
-              <span key={`${signer.name}-${signerIndex}`}>
-                <b>&nbsp;</b>
-                {signer.name}
-                <small>{signer.position} · Date: __________________</small>
-              </span>
-            ))}
-          </div>
         </div>
         <div className="modal-footer">
           <button className="secondary-button" onClick={onClose}>
