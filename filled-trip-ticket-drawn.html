@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Daily Driver's Trip Ticket — Filled</title>
+<style>
+  @page { size: A4; margin: 10mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f1f5f9; font-family: "Times New Roman", Times, serif; color: #000; }
+  .sheet { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 12mm 14mm; }
+  .letterhead { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 2.5px solid #1a3a5c; margin-bottom: 6px; }
+  .brand-mark { width: 26px; height: 26px; border: 2px solid #1a3a5c; border-radius: 4px; display: grid; place-items: center; font-weight: 800; font-size: 16px; color: #1a3a5c; font-family: Arial, sans-serif; }
+  .brand-text .coop { font-size: 11px; font-weight: 700; letter-spacing: .5px; line-height: 1.15; }
+  .brand-text .sub { font-size: 8.5px; color: #334155; }
+  .title { text-align: center; font-size: 15px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin: 10px 0; }
+  .row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 6px; font-size: 10px; }
+  .label { white-space: nowrap; font-weight: 600; }
+  .val { flex: 1; border-bottom: 1px solid #000; padding: 0 4px 2px; min-height: 14px; }
+  .val.right { text-align: right; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .section { margin-top: 10px; }
+  .section-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 9px; }
+  th, td { border: 0.6px solid #000; padding: 3px 4px; }
+  th { border-top: 1px solid #000; border-bottom: 1.4px solid #000; font-weight: 700; text-transform: uppercase; }
+  .sig-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .sig { border-bottom: 1px solid #000; min-height: 28px; padding: 2px 4px; font-size: 10px; }
+  .sig-cap { font-size: 7.5px; color: #334155; text-align: center; margin-top: 3px; }
+  .gp-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .gp { border: 1px solid #000; padding: 6px 8px; }
+  .gp h3 { text-align: center; font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 6px; border-bottom: 1px solid #000; padding-bottom: 3px; }
+  .gp .gpr { display: flex; align-items: baseline; gap: 4px; font-size: 8.5px; margin-bottom: 3px; }
+  .gp .gpl { white-space: nowrap; font-weight: 600; }
+  .gp .gpv { flex: 1; border-bottom: 1px solid #000; padding: 0 3px 1px; min-height: 12px; }
+  .divider { text-align: center; font-size: 8px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #334155; padding-top: 6px; border-top: 1px solid #999; margin-top: 10px; }
+  @media print { body { background: #fff; } .sheet { box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="letterhead">
+    <div class="brand-mark">P</div>
+    <div class="brand-text">
+      <div class="coop">PANGASINAN III ELECTRIC COOPERATIVE, INC.</div>
+      <div class="sub">PANELCO III · VehicleHub</div>
+    </div>
+  </div>
+  <div class="title">Daily Driver's Trip Ticket</div>
+
+  <div class="two">
+    <div class="row"><span class="label">Driver's Name</span><span class="val">Juan D. Cruz</span></div>
+    <div class="row"><span class="label">Date</span><span class="val">June 18, 2025</span></div>
+  </div>
+  <div class="two">
+    <div class="row"><span class="label">Destination</span><span class="val">Urdaneta City Substation</span></div>
+    <div class="row"><span class="label">Vehicle</span><span class="val">Toyota Hilux · NBO 4831</span></div>
+  </div>
+  <div class="two">
+    <div class="row"><span class="label">Purpose / Travel</span><span class="val">Routine inspection</span></div>
+    <div class="row"><span class="label">Passenger/s</span><span class="val">Maria L. Santos</span></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Fuel Consumption</div>
+    <table>
+      <tr><th>Particulars</th><th>Checked</th><th>Liters</th><th colspan="3">Trip</th></tr>
+      <tr>
+        <td>Diesel</td><td>✓</td><td>12.5</td>
+        <td rowspan="4" style="vertical-align:top;">
+          <table style="border:none;">
+            <tr><th style="border:none;">&nbsp;</th><th>KM Reading</th><th>Time</th></tr>
+            <tr><td>Departure</td><td>12450</td><td>07:30 AM</td></tr>
+            <tr><td>Arrived</td><td>12530</td><td>10:15 AM</td></tr>
+          </table>
+        </td>
+      </tr>
+      <tr><td>Super</td><td></td><td></td></tr>
+      <tr><td>Unleaded</td><td></td><td></td></tr>
+      <tr><td>Others</td><td></td><td></td></tr>
+    </table>
+    <div class="row" style="margin-top:6px;"><span class="label">Conforme:</span><span class="val">Juan D. Cruz</span></div>
+  </div>
+
+  <div class="sig-row">
+    <div><div class="sig">Juan D. Cruz</div><div class="sig-cap">Driver's Signature over Printed Name</div></div>
+    <div><div class="sig">R. Reyes</div><div class="sig-cap">Released By</div></div>
+    <div><div class="sig">M. Santos</div><div class="sig-cap">Noted By</div></div>
+    <div><div class="sig">Engr. Dela Cruz</div><div class="sig-cap">Approved By</div></div>
+  </div>
+
+  <div class="divider">Same Printed Sheet</div>
+
+  <div class="gp-wrap">
+    <div class="gp">
+      <h3>Gate Pass</h3>
+      <div class="gpr"><span class="gpl">Control No.</span><span class="gpv">GP-001</span><span class="gpl">Date</span><span class="gpv">June 18, 2025</span></div>
+      <div class="gpr"><span class="gpl">Time Out</span><span class="gpv">07:30</span><span class="gpl">Time In</span><span class="gpv">10:15</span></div>
+      <div class="gpr"><span class="gpl">Personnel</span><span class="gpv">Juan D. Cruz</span></div>
+      <div class="gpr"><span class="gpl">Position</span><span class="gpv">Driver</span></div>
+      <div class="gpr"><span class="gpl">Division</span><span class="gpv">Transport</span></div>
+      <div class="gpr"><span class="gpl">Destination</span><span class="gpv">Urdaneta City</span></div>
+      <div class="gpr"><span class="gpl">Purpose</span><span class="gpv">Inspection</span></div>
+      <div class="gpr" style="margin-top:6px;"><span class="gpl">Employee's Signature</span><span class="gpv">Juan D. Cruz</span></div>
+      <div class="gpr"><span class="gpl">Responsible Person</span><span class="gpv">R. Reyes</span></div>
+      <div class="gpr"><span class="gpl">Approved By</span><span class="gpv">Engr. Dela Cruz</span></div>
+    </div>
+    <div class="gp">
+      <h3>Gate Pass</h3>
+      <div class="gpr"><span class="gpl">Control No.</span><span class="gpv">GP-002</span><span class="gpl">Date</span><span class="gpv">June 18, 2025</span></div>
+      <div class="gpr"><span class="gpl">Time Out</span><span class="gpv">07:30</span><span class="gpl">Time In</span><span class="gpv">10:15</span></div>
+      <div class="gpr"><span class="gpl">Personnel</span><span class="gpv">Juan D. Cruz</span></div>
+      <div class="gpr"><span class="gpl">Position</span><span class="gpv">Driver</span></div>
+      <div class="gpr"><span class="gpl">Division</span><span class="gpv">Transport</span></div>
+      <div class="gpr"><span class="gpl">Destination</span><span class="gpv">Urdaneta City</span></div>
+      <div class="gpr"><span class="gpl">Purpose</span><span class="gpv">Inspection</span></div>
+      <div class="gpr" style="margin-top:6px;"><span class="gpl">Employee's Signature</span><span class="gpv">Juan D. Cruz</span></div>
+      <div class="gpr"><span class="gpl">Responsible Person</span><span class="gpv">R. Reyes</span></div>
+      <div class="gpr"><span class="gpl">Approved By</span><span class="gpv">Engr. Dela Cruz</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

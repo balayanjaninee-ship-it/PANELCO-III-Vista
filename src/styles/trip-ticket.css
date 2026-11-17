@@ -378,6 +378,20 @@
   line-height: 1;
 }
 
+/* ---------- Scanned form paper (background) ---------- */
+.tt-paper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
 /* ---------- Fillable fields (absolute overlays) ---------- */
 .tt-field {
   position: absolute;
@@ -412,6 +426,8 @@ input[type="checkbox"].tt-field {
 
 /* ---------- Print ---------- */
 @media print {
+  .tt-drawn { page-break-inside: avoid; }
+  .tt-drawn table { page-break-inside: avoid; }
   .trip-ticket-form {
     box-shadow: none;
     width: 100%;
@@ -420,11 +436,11 @@ input[type="checkbox"].tt-field {
   .trip-ticket-form::before {
     display: none;
   }
-  .trip-ticket-surface {
+  .tt-paper {
     position: static;
     width: 100%;
     height: auto;
-    padding: 0;
+    display: block;
   }
   .tt-field {
     background: transparent !important;

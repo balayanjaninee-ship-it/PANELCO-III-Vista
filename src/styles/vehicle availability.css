@@ -928,11 +928,19 @@ main {
 .mini-calendar {
   border-left: 1px solid #edf0f3;
   padding-left: 18px;
+  padding: 14px;
+  border-radius: 8px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
 }
 .calendar-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
 }
 .calendar-head > div:first-child {
   display: flex;
@@ -972,29 +980,36 @@ main {
 }
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  margin-top: 3px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 6px;
 }
 .calendar-grid span {
-  height: 17px;
+  height: 30px;
   display: grid;
   place-items: center;
-  font-size: var(--typo-label-sm-size);
+  font-size: 12px;
   line-height: var(--typo-label-sm-line-height);
   color: #4b586a;
-  border-radius: 3px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #eef1f5;
 }
 .calendar-grid.weekday span {
   color: #9ba5b3;
   font-weight: 700;
+  background: transparent;
+  border: none;
 }
 .calendar-grid span.off {
   background: #f0f2f4;
   color: #a7afb9;
+  border: none;
 }
 .calendar-grid span.booked {
   background: #ffebcb;
   color: #9b5d0d;
+  border: none;
 }
 
 .selected-vehicle-bar {

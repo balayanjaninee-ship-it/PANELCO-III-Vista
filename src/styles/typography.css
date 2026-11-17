@@ -1,6 +1,7 @@
 /* ============================================================
-   PANELCO VehicleHub — Standard Typography System
-   Material Design 3 type scale with CSS variables
+   PANELCO III VISTA — Standard Typography System
+   Single source of truth for fonts across the entire system.
+   Font family: Inter. Sizes/weights follow the standard scale.
    ============================================================ */
 
 @layer base {
@@ -8,78 +9,207 @@
     /* Font family — Inter used across the entire system */
     --font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
 
-    /* --- CSS Variables for type sizes (px) --- */
-    --typo-display-size: 57px;
-    --typo-display-line-height: 64px;
-    --typo-display-weight: 400;
-    --typo-display-tracking: -0.25px;
+    /* ---------- New standard semantic variables ---------- */
+    --text-page-title-size: 24px;
+    --text-page-title-weight: 600;
+    --text-page-title-line-height: 32px;
+
+    --text-page-description-size: 14px;
+    --text-page-description-weight: 400;
+    --text-page-description-line-height: 20px;
+
+    --text-section-heading-size: 18px;
+    --text-section-heading-weight: 600;
+    --text-section-heading-line-height: 24px;
+
+    --text-card-title-size: 14px;
+    --text-card-title-weight: 500;
+    --text-card-title-line-height: 20px;
+
+    --text-stat-number-size: 30px;
+    --text-stat-number-weight: 700;
+    --text-stat-number-line-height: 36px;
+
+    --text-table-header-size: 13px;
+    --text-table-header-weight: 600;
+    --text-table-header-line-height: 18px;
+
+    --text-table-content-size: 14px;
+    --text-table-content-weight: 400;
+    --text-table-content-line-height: 20px;
+
+    --text-form-label-size: 13px;
+    --text-form-label-weight: 500;
+    --text-form-label-line-height: 18px;
+
+    --text-input-size: 14px;
+    --text-input-weight: 400;
+    --text-input-line-height: 20px;
+
+    --text-button-size: 14px;
+    --text-button-weight: 500;
+    --text-button-line-height: 20px;
+
+    --text-sidebar-size: 14px;
+    --text-sidebar-weight: 500;
+    --text-sidebar-line-height: 20px;
+
+    --text-header-size: 14px;
+    --text-header-weight: 500;
+    --text-header-line-height: 20px;
+
+    --text-badge-size: 12px;
+    --text-badge-weight: 500;
+    --text-badge-line-height: 16px;
+
+    --text-helper-size: 12px;
+    --text-helper-weight: 400;
+    --text-helper-line-height: 16px;
+
+    /* ---------- Backward-compatible variables (remapped) ---------- */
+    --typo-display-size: 32px;
+    --typo-display-line-height: 40px;
+    --typo-display-weight: 700;
+    --typo-display-tracking: 0;
 
     --typo-headline-lg-size: 32px;
     --typo-headline-lg-line-height: 40px;
-    --typo-headline-lg-weight: 400;
+    --typo-headline-lg-weight: 700;
     --typo-headline-lg-tracking: 0;
 
     --typo-headline-md-size: 28px;
     --typo-headline-md-line-height: 36px;
-    --typo-headline-md-weight: 400;
+    --typo-headline-md-weight: 700;
     --typo-headline-md-tracking: 0;
 
     --typo-headline-sm-size: 24px;
     --typo-headline-sm-line-height: 32px;
-    --typo-headline-sm-weight: 700;
+    --typo-headline-sm-weight: 600;
     --typo-headline-sm-tracking: 0;
 
-    --typo-title-lg-size: 22px;
-    --typo-title-lg-line-height: 28px;
-    --typo-title-lg-weight: 500;
+    --typo-title-lg-size: 18px;
+    --typo-title-lg-line-height: 24px;
+    --typo-title-lg-weight: 600;
     --typo-title-lg-tracking: 0;
 
-    --typo-title-md-size: 16px;
-    --typo-title-md-line-height: 24px;
+    --typo-title-md-size: 14px;
+    --typo-title-md-line-height: 20px;
     --typo-title-md-weight: 500;
-    --typo-title-md-tracking: 0.15px;
+    --typo-title-md-tracking: 0;
 
     --typo-title-sm-size: 14px;
     --typo-title-sm-line-height: 20px;
     --typo-title-sm-weight: 500;
-    --typo-title-sm-tracking: 0.1px;
+    --typo-title-sm-tracking: 0;
 
-    --typo-body-lg-size: 16px;
-    --typo-body-lg-line-height: 24px;
+    --typo-body-lg-size: 14px;
+    --typo-body-lg-line-height: 20px;
     --typo-body-lg-weight: 400;
-    --typo-body-lg-tracking: 0.5px;
+    --typo-body-lg-tracking: 0;
 
     --typo-body-md-size: 14px;
     --typo-body-md-line-height: 20px;
     --typo-body-md-weight: 400;
-    --typo-body-md-tracking: 0.25px;
+    --typo-body-md-tracking: 0;
 
     --typo-body-sm-size: 12px;
     --typo-body-sm-line-height: 16px;
     --typo-body-sm-weight: 400;
-    --typo-body-sm-tracking: 0.4px;
+    --typo-body-sm-tracking: 0;
 
     --typo-label-lg-size: 14px;
     --typo-label-lg-line-height: 20px;
     --typo-label-lg-weight: 500;
-    --typo-label-lg-tracking: 0.1px;
+    --typo-label-lg-tracking: 0;
 
-    --typo-label-md-size: 12px;
-    --typo-label-md-line-height: 16px;
+    --typo-label-md-size: 13px;
+    --typo-label-md-line-height: 18px;
     --typo-label-md-weight: 500;
-    --typo-label-md-tracking: 0.5px;
+    --typo-label-md-tracking: 0;
 
-    --typo-label-sm-size: 11px;
+    --typo-label-sm-size: 12px;
     --typo-label-sm-line-height: 16px;
     --typo-label-sm-weight: 500;
-    --typo-label-sm-tracking: 0.5px;
+    --typo-label-sm-tracking: 0;
   }
 
-  /* --- Utility classes --- */
   .font-family {
     font-family: var(--font-family);
   }
 
+  /* ---------- Semantic utility classes ---------- */
+  .text-page-title {
+    font-size: var(--text-page-title-size);
+    line-height: var(--text-page-title-line-height);
+    font-weight: var(--text-page-title-weight);
+  }
+  .text-page-description {
+    font-size: var(--text-page-description-size);
+    line-height: var(--text-page-description-line-height);
+    font-weight: var(--text-page-description-weight);
+  }
+  .text-section-heading {
+    font-size: var(--text-section-heading-size);
+    line-height: var(--text-section-heading-line-height);
+    font-weight: var(--text-section-heading-weight);
+  }
+  .text-card-title {
+    font-size: var(--text-card-title-size);
+    line-height: var(--text-card-title-line-height);
+    font-weight: var(--text-card-title-weight);
+  }
+  .text-stat-number {
+    font-size: var(--text-stat-number-size);
+    line-height: var(--text-stat-number-line-height);
+    font-weight: var(--text-stat-number-weight);
+  }
+  .text-table-header {
+    font-size: var(--text-table-header-size);
+    line-height: var(--text-table-header-line-height);
+    font-weight: var(--text-table-header-weight);
+  }
+  .text-table-content {
+    font-size: var(--text-table-content-size);
+    line-height: var(--text-table-content-line-height);
+    font-weight: var(--text-table-content-weight);
+  }
+  .text-form-label {
+    font-size: var(--text-form-label-size);
+    line-height: var(--text-form-label-line-height);
+    font-weight: var(--text-form-label-weight);
+  }
+  .text-input {
+    font-size: var(--text-input-size);
+    line-height: var(--text-input-line-height);
+    font-weight: var(--text-input-weight);
+  }
+  .text-button {
+    font-size: var(--text-button-size);
+    line-height: var(--text-button-line-height);
+    font-weight: var(--text-button-weight);
+  }
+  .text-sidebar {
+    font-size: var(--text-sidebar-size);
+    line-height: var(--text-sidebar-line-height);
+    font-weight: var(--text-sidebar-weight);
+  }
+  .text-header {
+    font-size: var(--text-header-size);
+    line-height: var(--text-header-line-height);
+    font-weight: var(--text-header-weight);
+  }
+  .text-badge {
+    font-size: var(--text-badge-size);
+    line-height: var(--text-badge-line-height);
+    font-weight: var(--text-badge-weight);
+  }
+  .text-helper {
+    font-size: var(--text-helper-size);
+    line-height: var(--text-helper-line-height);
+    font-weight: var(--text-helper-weight);
+  }
+
+  /* ---------- Backward-compatible utility classes ---------- */
   .typo-display {
     font-size: var(--typo-display-size);
     line-height: var(--typo-display-line-height);

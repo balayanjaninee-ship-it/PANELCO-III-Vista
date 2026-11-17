@@ -1,929 +1,226 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import "../styles/trip-ticket.css";
 
 const PREFIX = "ddtt_";
 
-type FieldType = "text" | "checkbox";
-
-interface FieldDef {
-  id: string;
-  label?: string; // printed label shown next to the field
-  l: number; // left  (% of the A4 sheet width)
-  t: number; // top  (% of the A4 sheet height)
-  w: number; // width (%)
-  h: number; // height (%)
-  type?: FieldType;
-  underline?: boolean; // draw a bottom border line instead of a box
-}
-
-/**
- * Field coordinates measured from the official scan proportions.
- * Each field is absolutely positioned over the drawn form so typed text
- * lands on the pre-printed lines exactly like the real form.
- */
-const FIELDS: FieldDef[] = [
-  // --- Header block ---
-  { id: "driver_name", label: "Driver's Name", l: 18.76, t: 12.79, w: 34.73, h: 1.19, underline: true },
-  { id: "date", label: "Date", l: 58.54, t: 12.87, w: 31.37, h: 1.19, underline: true },
-  { id: "destination", label: "Destination", l: 18.76, t: 14.37, w: 34.73, h: 1.39, underline: true },
-  { id: "vehicle", label: "Vehicle", l: 62.5, t: 14.37, w: 29, h: 1.39, underline: true },
-  { id: "purpose", label: "Purpose / Travel", l: 18.48, t: 15.72, w: 34.73, h: 1.19, underline: true },
-  { id: "passengers", label: "Passenger/s", l: 67.79, t: 15.68, w: 25.21, h: 1.19, underline: true },
-
-  // --- Fuel block (checkboxes + liters) ---
-  { id: "chk_diesel", l: 11.48, t: 22.88, w: 1.01, h: 0.71, type: "checkbox" },
-  { id: "liters_diesel", l: 23.53, t: 22.88, w: 6.72, h: 0.99, underline: true },
-  { id: "chk_super", l: 11.48, t: 24.35, w: 1.01, h: 0.71, type: "checkbox" },
-  { id: "liters_super", l: 23.53, t: 24.35, w: 6.72, h: 0.99, underline: true },
-  { id: "chk_unleaded", l: 11.48, t: 25.58, w: 1.01, h: 0.71, type: "checkbox" },
-  { id: "liters_unleaded", l: 23.53, t: 25.58, w: 6.72, h: 0.99, underline: true },
-  { id: "chk_others", l: 11.48, t: 26.88, w: 1.01, h: 0.71, type: "checkbox" },
-  { id: "liters_others", l: 23.53, t: 26.88, w: 6.72, h: 0.99, underline: true },
-
-  // --- Trip table (right): Particulars | KM Reading | Time ---
-  { id: "km_reading_departure", l: 60.8, t: 21.6, w: 10.4, h: 1.1, underline: true },
-  { id: "time_departure", l: 72, t: 21.6, w: 10.5, h: 1.1, underline: true },
-  { id: "km_reading_arrived", l: 60.8, t: 22.9, w: 10.4, h: 1.1, underline: true },
-  { id: "time_arrived", l: 72, t: 22.9, w: 10.5, h: 1.1, underline: true },
-
-  { id: "conforme", l: 62.13, t: 27.12, w: 31.37, h: 1.19, underline: true },
-  { id: "driver_sig", l: 70.76, t: 32.66, w: 26.89, h: 1.78, underline: true },
-  { id: "released_sig", l: 5.6, t: 36.82, w: 16.81, h: 2.38, underline: true },
-  { id: "noted_sig", l: 34.23, t: 36.82, w: 16.81, h: 2.38, underline: true },
-  { id: "approved_sig", l: 62.13, t: 36.82, w: 16.81, h: 2.38, underline: true },
-
-  // --- Gate Pass 1 ---
-  { id: "gp1_control_no", l: 10.92, t: 55.42, w: 15.69, h: 0.99, underline: true },
-  { id: "gp1_date", l: 30.53, t: 55.42, w: 15.69, h: 0.99, underline: true },
-  { id: "gp1_time_out", l: 8.96, t: 56.81, w: 8.4, h: 0.99, underline: true },
-  { id: "gp1_time_in", l: 30.25, t: 56.81, w: 8.4, h: 0.99, underline: true },
-  { id: "gp1_personnel", l: 12.32, t: 58.19, w: 14.56, h: 0.99, underline: true },
-  { id: "gp1_position", l: 11.2, t: 60.77, w: 14.56, h: 0.99, underline: true },
-  { id: "gp1_division", l: 10.92, t: 62.15, w: 14.56, h: 0.99, underline: true },
-  { id: "gp1_destination", l: 11.77, t: 63.78, w: 14.56, h: 0.99, underline: true },
-  { id: "gp1_purpose", l: 10.92, t: 66.33, w: 14.56, h: 0.99, underline: true },
-  { id: "gp1_employee", l: 41.46, t: 71.02, w: 14.56, h: 0.99, underline: true },
-  { id: "gp1_responsible", l: 13.45, t: 72.64, w: 14.56, h: 0.99, underline: true },
-  { id: "gp1_approved", l: 33.61, t: 77.4, w: 14.56, h: 0.99, underline: true },
-
-  // --- Gate Pass 2 ---
-  { id: "gp2_control_no", l: 60.22, t: 55.62, w: 15.69, h: 0.99, underline: true },
-  { id: "gp2_date", l: 79.27, t: 55.62, w: 15.69, h: 0.99, underline: true },
-  { id: "gp2_time_out", l: 58.77, t: 57.01, w: 8.4, h: 0.99, underline: true },
-  { id: "gp2_time_in", l: 78.65, t: 57.01, w: 8.4, h: 0.99, underline: true },
-  { id: "gp2_personnel", l: 62.13, t: 58.39, w: 14.56, h: 0.99, underline: true },
-  { id: "gp2_position", l: 61.01, t: 60.97, w: 14.56, h: 0.99, underline: true },
-  { id: "gp2_division", l: 61.01, t: 62.48, w: 14.56, h: 0.99, underline: true },
-  { id: "gp2_destination", l: 61.85, t: 64.06, w: 14.56, h: 0.99, underline: true },
-  { id: "gp2_purpose", l: 61.01, t: 66.41, w: 14.56, h: 0.99, underline: true },
-  { id: "gp2_employee", l: 88.97, t: 70.86, w: 11.2, h: 0.99, underline: true },
-  { id: "gp2_responsible", l: 70.03, t: 72.64, w: 14.56, h: 0.99, underline: true },
-  { id: "gp2_approved", l: 82.35, t: 77.95, w: 14.56, h: 0.99, underline: true },
+const FIELD_IDS: string[] = [
+  "driver_name", "date", "destination", "vehicle", "purpose", "passengers",
+  "chk_diesel", "liters_diesel", "chk_super", "liters_super", "chk_unleaded", "liters_unleaded", "chk_others", "liters_others",
+  "km_reading_departure", "time_departure", "km_reading_arrived", "time_arrived",
+  "conforme", "driver_sig", "released_sig", "noted_sig", "approved_sig",
+  "gp1_control_no", "gp1_date", "gp1_time_out", "gp1_time_in", "gp1_personnel", "gp1_position", "gp1_division", "gp1_destination", "gp1_purpose", "gp1_employee", "gp1_responsible", "gp1_approved",
+  "gp2_control_no", "gp2_date", "gp2_time_out", "gp2_time_in", "gp2_personnel", "gp2_position", "gp2_division", "gp2_destination", "gp2_purpose", "gp2_employee", "gp2_responsible", "gp2_approved",
 ];
 
 function readField(id: string): string {
-  try {
-    return localStorage.getItem(PREFIX + id) ?? "";
-  } catch {
-    return "";
-  }
+  try { return localStorage.getItem(PREFIX + id) ?? ""; } catch { return ""; }
 }
-
 function writeField(id: string, value: string): void {
   try {
     if (value) localStorage.setItem(PREFIX + id, value);
     else localStorage.removeItem(PREFIX + id);
-  } catch {
-    /* storage unavailable — keep the value in memory only */
-  }
+  } catch { /* ignore */ }
 }
 
 export function readTripTicketDraft(): Record<string, string> {
   const out: Record<string, string> = {};
-  for (const f of FIELDS) out[f.id] = readField(f.id);
+  for (const id of FIELD_IDS) out[id] = readField(id);
   return out;
 }
-
 export function clearTripTicketDraft(): void {
-  try {
-    for (const f of FIELDS) localStorage.removeItem(PREFIX + f.id);
-  } catch {
-    /* ignore */
-  }
+  try { for (const id of FIELD_IDS) localStorage.removeItem(PREFIX + id); } catch { /* ignore */ }
 }
 
-/**
- * Daily Driver's Trip Ticket — drawn form with fillable fields.
- * No scanned image is used; the form layout is built with CSS borders
- * and lines so typed text lands on the pre-printed fields.
- */
-export default function TripTicketForm() {
-  const [values, setValues] = useState<Record<string, string>>(() =>
-    readTripTicketDraft()
+interface Props { defaults?: Record<string, string>; }
+
+const inp: CSSProperties = {
+  width: "100%", border: "none", borderBottom: "1px solid #000",
+  background: "transparent", fontFamily: "Times New Roman, Times, serif",
+  fontSize: 10, padding: "0 2px", outline: "none",
+};
+const chk: CSSProperties = { accentColor: "#000", margin: 0 };
+
+function F({ id, values, handle, style }: { id: string; values: Record<string, string>; handle: (id: string, v: string) => void; style?: CSSProperties }) {
+  return (
+    <input
+      id={id}
+      type="text"
+      value={values[id] ?? ""}
+      onChange={(e) => handle(id, e.target.value)}
+      style={{ ...inp, ...style }}
+    />
   );
+}
+
+export default function TripTicketForm({ defaults }: Props) {
+  const [values, setValues] = useState<Record<string, string>>(() => {
+    const draft = readTripTicketDraft();
+    const merged = { ...draft };
+    if (defaults) for (const [k, v] of Object.entries(defaults)) if (!merged[k]) merged[k] = v;
+    return merged;
+  });
+  useEffect(() => {
+    if (!defaults) return;
+    setValues((prev) => {
+      const next = { ...prev }; let changed = false;
+      for (const [k, v] of Object.entries(defaults)) if (!next[k]) { next[k] = v; changed = true; }
+      return changed ? next : prev;
+    });
+  }, [defaults]);
 
   const handle = useCallback((id: string, value: string) => {
     setValues((prev) => ({ ...prev, [id]: value }));
     writeField(id, value);
   }, []);
 
+  const C = (id: string) => (
+    <input type="checkbox" style={chk} checked={values[id] === "on"} onChange={(e) => handle(id, e.target.checked ? "on" : "")} />
+  );
+
   return (
-    <div className="trip-ticket-form">
+    <div className="tt-drawn" style={{ background: "#fff", padding: "12mm 14mm", fontFamily: "Times New Roman, Times, serif", color: "#000" }}>
       {/* Letterhead */}
-      <div className="tt-letterhead">
-        <div className="tt-brand-mark">P</div>
-        <div className="tt-brand-text">
-          <div className="tt-coop">PANGASINAN III ELECTRIC COOPERATIVE, INC.</div>
-          <div className="tt-sub">PANELCO III · VehicleHub</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, paddingBottom: 10, borderBottom: "2.5px solid #1a3a5c", marginBottom: 6 }}>
+        <div style={{ width: 26, height: 26, border: "2px solid #1a3a5c", borderRadius: 4, display: "grid", placeItems: "center", fontWeight: 800, fontSize: 16, color: "#1a3a5c", fontFamily: "Arial, sans-serif" }}>P</div>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".5px", lineHeight: 1.15 }}>PANGASINAN III ELECTRIC COOPERATIVE, INC.</div>
+          <div style={{ fontSize: 8.5, color: "#334155" }}>PANELCO III · VehicleHub</div>
         </div>
       </div>
+      <div style={{ textAlign: "center", fontSize: 15, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", margin: "10px 0" }}>Daily Driver's Trip Ticket</div>
 
-      {/* Title */}
-      <div className="tt-title">DAILY DRIVER'S TRIP TICKET</div>
-
-      {/* Main info section */}
-      <div className="tt-section tt-info">
-        <div className="tt-field-row">
-          <span className="tt-label">Driver's Name</span>
-          <input
-            id="driver_name"
-            type="text"
-            className="tt-field tt-underline"
-            style={{
-              left: "18.76%",
-              top: "12.79%",
-              width: "34.73%",
-              height: "1.19%",
-            }}
-            value={values["driver_name"] ?? ""}
-            onChange={(e) => handle("driver_name", e.target.value)}
-          />
-          <span className="tt-label tt-label-right">Date</span>
-          <input
-            id="date"
-            type="text"
-            className="tt-field tt-underline"
-            style={{
-              left: "58.54%",
-              top: "12.87%",
-              width: "31.37%",
-              height: "1.19%",
-            }}
-            value={values["date"] ?? ""}
-            onChange={(e) => handle("date", e.target.value)}
-          />
-        </div>
-        <div className="tt-field-row">
-          <span className="tt-label">Destination</span>
-          <input
-            id="destination"
-            type="text"
-            className="tt-field tt-underline"
-            style={{
-              left: "18.76%",
-              top: "14.37%",
-              width: "34.73%",
-              height: "1.39%",
-            }}
-            value={values["destination"] ?? ""}
-            onChange={(e) => handle("destination", e.target.value)}
-          />
-          <span className="tt-label tt-label-right">Vehicle</span>
-          <input
-            id="vehicle"
-            type="text"
-            className="tt-field tt-underline"
-            style={{
-              left: "62.5%",
-              top: "14.37%",
-              width: "29%",
-              height: "1.39%",
-            }}
-            value={values["vehicle"] ?? ""}
-            onChange={(e) => handle("vehicle", e.target.value)}
-          />
-        </div>
-        <div className="tt-field-row">
-          <span className="tt-label">Purpose / Travel</span>
-          <input
-            id="purpose"
-            type="text"
-            className="tt-field tt-underline"
-            style={{
-              left: "18.48%",
-              top: "15.72%",
-              width: "34.73%",
-              height: "1.19%",
-            }}
-            value={values["purpose"] ?? ""}
-            onChange={(e) => handle("purpose", e.target.value)}
-          />
-          <span className="tt-label tt-label-right">Passenger/s</span>
-          <input
-            id="passengers"
-            type="text"
-            className="tt-field tt-underline"
-            style={{
-              left: "67.79%",
-              top: "15.68%",
-              width: "25.21%",
-              height: "1.19%",
-            }}
-            value={values["passengers"] ?? ""}
-            onChange={(e) => handle("passengers", e.target.value)}
-          />
-        </div>
+      {/* Header info */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px", marginBottom: 8, fontSize: 10 }}>
+        <label style={{ display: "flex", alignItems: "baseline", gap: 6 }}><span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>Driver's Name</span><F id="driver_name" values={values} handle={handle} /></label>
+        <label style={{ display: "flex", alignItems: "baseline", gap: 6 }}><span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>Date</span><F id="date" values={values} handle={handle} /></label>
+        <label style={{ display: "flex", alignItems: "baseline", gap: 6 }}><span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>Destination</span><F id="destination" values={values} handle={handle} /></label>
+        <label style={{ display: "flex", alignItems: "baseline", gap: 6 }}><span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>Vehicle</span><F id="vehicle" values={values} handle={handle} /></label>
+        <label style={{ display: "flex", alignItems: "baseline", gap: 6 }}><span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>Purpose / Travel</span><F id="purpose" values={values} handle={handle} /></label>
+        <label style={{ display: "flex", alignItems: "baseline", gap: 6 }}><span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>Passenger/s</span><F id="passengers" values={values} handle={handle} /></label>
       </div>
 
-      {/* Fuel consumption block */}
-      <div className="tt-section tt-fuel">
-        <div className="tt-fuel-header">FUEL CONSUMPTION</div>
-        <div className="tt-fuel-table">
-          <div className="tt-fuel-row tt-fuel-head">
-            <span className="tt-fuel-col c1">Particulars</span>
-            <span className="tt-fuel-col c2">KM Reading</span>
-            <span className="tt-fuel-col c3">Time</span>
-          </div>
-          <div className="tt-fuel-row">
-            <span className="tt-fuel-col c1">
-              <input
-                type="checkbox"
-                className="tt-checkbox"
-                checked={values["chk_diesel"] === "on"}
-                onChange={(e) =>
-                  handle("chk_diesel", e.target.checked ? "on" : "")
-                }
-              />
-              </span>
-            <span className="tt-fuel-col c2">Diesel</span>
-            <span className="tt-fuel-col c3">
-              <input
-                id="liters_diesel"
-                type="text"
-                className="tt-field tt-underline tt-tight"
-                style={{
-                  left: "23.53%",
-                  top: "22.88%",
-                  width: "6.72%",
-                  height: "0.99%",
-                }}
-                value={values["liters_diesel"] ?? ""}
-                onChange={(e) => handle("liters_diesel", e.target.value)}
-              />
-            </span>
-          </div>
-          <div className="tt-fuel-row">
-            <span className="tt-fuel-col c1">
-              <input
-                type="checkbox"
-                className="tt-checkbox"
-                checked={values["chk_super"] === "on"}
-                onChange={(e) =>
-                  handle("chk_super", e.target.checked ? "on" : "")
-                }
-              />
-              </span>
-            <span className="tt-fuel-col c2">Super</span>
-            <span className="tt-fuel-col c3">
-              <input
-                id="liters_super"
-                type="text"
-                className="tt-field tt-underline tt-tight"
-                style={{
-                  left: "23.53%",
-                  top: "24.35%",
-                  width: "6.72%",
-                  height: "0.99%",
-                }}
-                value={values["liters_super"] ?? ""}
-                onChange={(e) => handle("liters_super", e.target.value)}
-              />
-            </span>
-          </div>
-          <div className="tt-fuel-row">
-            <span className="tt-fuel-col c1">
-              <input
-                type="checkbox"
-                className="tt-checkbox"
-                checked={values["chk_unleaded"] === "on"}
-                onChange={(e) =>
-                  handle("chk_unleaded", e.target.checked ? "on" : "")
-                }
-              />
-              </span>
-            <span className="tt-fuel-col c2">Unleaded</span>
-            <span className="tt-fuel-col c3">
-              <input
-                id="liters_unleaded"
-                type="text"
-                className="tt-field tt-underline tt-tight"
-                style={{
-                  left: "23.53%",
-                  top: "25.58%",
-                  width: "6.72%",
-                  height: "0.99%",
-                }}
-                value={values["liters_unleaded"] ?? ""}
-                onChange={(e) => handle("liters_unleaded", e.target.value)}
-              />
-            </span>
-          </div>
-          <div className="tt-fuel-row">
-            <span className="tt-fuel-col c1">
-              <input
-                type="checkbox"
-                className="tt-checkbox"
-                checked={values["chk_others"] === "on"}
-                onChange={(e) =>
-                  handle("chk_others", e.target.checked ? "on" : "")
-                }
-              />
-              </span>
-            <span className="tt-fuel-col c2">Others</span>
-            <span className="tt-fuel-col c3">
-              <input
-                id="liters_others"
-                type="text"
-                className="tt-field tt-underline tt-tight"
-                style={{
-                  left: "23.53%",
-                  top: "26.88%",
-                  width: "6.72%",
-                  height: "0.99%",
-                }}
-                value={values["liters_others"] ?? ""}
-                onChange={(e) => handle("liters_others", e.target.value)}
-              />
-            </span>
-          </div>
+      {/* Fuel + Trip */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 8 }}>
+        <div>
+          <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 4 }}>Fuel Consumption</div>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 9 }}>
+            <thead>
+              <tr>
+                <th style={{ border: "0.6px solid #000", padding: "3px 4px", borderTop: "1px solid #000", borderBottom: "1.4px solid #000", fontWeight: 700, textTransform: "uppercase" }}>Particulars</th>
+                <th style={{ border: "0.6px solid #000", padding: "3px 4px", borderTop: "1px solid #000", borderBottom: "1.4px solid #000", fontWeight: 700, textTransform: "uppercase" }}>Checked</th>
+                <th style={{ border: "0.6px solid #000", padding: "3px 4px", borderTop: "1px solid #000", borderBottom: "1.4px solid #000", fontWeight: 700, textTransform: "uppercase" }}>Liters</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["Diesel", "chk_diesel", "liters_diesel"],
+                ["Super", "chk_super", "liters_super"],
+                ["Unleaded", "chk_unleaded", "liters_unleaded"],
+                ["Others", "chk_others", "liters_others"],
+              ].map(([name, c, l]) => (
+                <tr key={name}>
+                  <td style={{ border: "0.6px solid #000", padding: "3px 4px" }}>{name}</td>
+                  <td style={{ border: "0.6px solid #000", padding: "3px 4px", textAlign: "center" }}>{C(c)}</td>
+                  <td style={{ border: "0.6px solid #000", padding: "2px 4px" }}><F id={l} values={values} handle={handle} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-
-        {/* Trip table: Departure / Arrived */}
-        <div className="tt-trip-table">
-          <div className="tt-trip-row tt-trip-head">
-            <span className="tt-trip-col c1"></span>
-            <span className="tt-trip-col c2">KM Reading</span>
-            <span className="tt-trip-col c3">Time</span>
+        <div>
+          <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".5px", marginBottom: 4 }}>Trip</div>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 9 }}>
+            <thead>
+              <tr>
+                <th style={{ border: "0.6px solid #000", padding: "3px 4px", borderTop: "1px solid #000", borderBottom: "1.4px solid #000", fontWeight: 700, textTransform: "uppercase" }}></th>
+                <th style={{ border: "0.6px solid #000", padding: "3px 4px", borderTop: "1px solid #000", borderBottom: "1.4px solid #000", fontWeight: 700, textTransform: "uppercase" }}>KM Reading</th>
+                <th style={{ border: "0.6px solid #000", padding: "3px 4px", borderTop: "1px solid #000", borderBottom: "1.4px solid #000", fontWeight: 700, textTransform: "uppercase" }}>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{ border: "0.6px solid #000", padding: "3px 4px" }}>Departure</td>
+                <td style={{ border: "0.6px solid #000", padding: "2px 4px" }}><F id="km_reading_departure" values={values} handle={handle} /></td>
+                <td style={{ border: "0.6px solid #000", padding: "2px 4px" }}><F id="time_departure" values={values} handle={handle} /></td>
+              </tr>
+              <tr>
+                <td style={{ border: "0.6px solid #000", padding: "3px 4px" }}>Arrived</td>
+                <td style={{ border: "0.6px solid #000", padding: "2px 4px" }}><F id="km_reading_arrived" values={values} handle={handle} /></td>
+                <td style={{ border: "0.6px solid #000", padding: "2px 4px" }}><F id="time_arrived" values={values} handle={handle} /></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginTop: 6, fontSize: 10 }}>
+            <span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>Conforme:</span>
+            <F id="conforme" values={values} handle={handle} />
           </div>
-          <div className="tt-trip-row">
-            <span className="tt-trip-col c1">Departure</span>
-            <span className="tt-trip-col c2">
-              <input
-                id="km_reading_departure"
-                type="text"
-                className="tt-field tt-underline tt-tight"
-                style={{
-                  left: "60.8%",
-                  top: "21.6%",
-                  width: "10.4%",
-                  height: "1.1%",
-                }}
-                value={values["km_reading_departure"] ?? ""}
-                onChange={(e) => handle("km_reading_departure", e.target.value)}
-              />
-            </span>
-            <span className="tt-trip-col c3">
-              <input
-                id="time_departure"
-                type="text"
-                className="tt-field tt-underline tt-tight"
-                style={{
-                  left: "72%",
-                  top: "21.6%",
-                  width: "10.5%",
-                  height: "1.1%",
-                }}
-                value={values["time_departure"] ?? ""}
-                onChange={(e) => handle("time_departure", e.target.value)}
-              />
-            </span>
-          </div>
-          <div className="tt-trip-row">
-            <span className="tt-trip-col c1">Arrived</span>
-            <span className="tt-trip-col c2">
-              <input
-                id="km_reading_arrived"
-                type="text"
-                className="tt-field tt-underline tt-tight"
-                style={{
-                  left: "60.8%",
-                  top: "22.9%",
-                  width: "10.4%",
-                  height: "1.1%",
-                }}
-                value={values["km_reading_arrived"] ?? ""}
-                onChange={(e) => handle("km_reading_arrived", e.target.value)}
-              />
-            </span>
-            <span className="tt-trip-col c3">
-              <input
-                id="time_arrived"
-                type="text"
-                className="tt-field tt-underline tt-tight"
-                style={{
-                  left: "72%",
-                  top: "22.9%",
-                  width: "10.5%",
-                  height: "1.1%",
-                }}
-                value={values["time_arrived"] ?? ""}
-                onChange={(e) => handle("time_arrived", e.target.value)}
-              />
-            </span>
-          </div>
-        </div>
-
-        <div className="tt-conforme-row">
-          <span className="tt-label-small">Conforme:</span>
-          <input
-            id="conforme"
-            type="text"
-            className="tt-field tt-underline"
-            style={{
-              left: "62.13%",
-              top: "27.12%",
-              width: "31.37%",
-              height: "1.19%",
-            }}
-            value={values["conforme"] ?? ""}
-            onChange={(e) => handle("conforme", e.target.value)}
-          />
         </div>
       </div>
 
       {/* Signatures */}
-      <div className="tt-section tt-signatures">
-        <div className="tt-sig-row">
-          <div className="tt-sig-cell">
-            <input
-              id="driver_sig"
-              type="text"
-              className="tt-field tt-underline tt-sig"
-              style={{
-                left: "70.76%",
-                top: "32.66%",
-                width: "26.89%",
-                height: "1.78%",
-              }}
-              value={values["driver_sig"] ?? ""}
-              onChange={(e) => handle("driver_sig", e.target.value)}
-            />
-            <div className="tt-sig-caption">Driver's Signature over Printed Name</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginTop: 16 }}>
+        {[
+          ["driver_sig", "Driver's Signature over Printed Name"],
+          ["released_sig", "Released By"],
+          ["noted_sig", "Noted By"],
+          ["approved_sig", "Approved By"],
+        ].map(([id, cap]) => (
+          <div key={id}>
+            <F id={id} values={values} handle={handle} />
+            <div style={{ fontSize: 7.5, color: "#334155", textAlign: "center", marginTop: 3, lineHeight: 1.1 }}>{cap}</div>
           </div>
-          <div className="tt-sig-cell">
-            <input
-              id="released_sig"
-              type="text"
-              className="tt-field tt-underline tt-sig"
-              style={{
-                left: "5.6%",
-                top: "36.82%",
-                width: "16.81%",
-                height: "2.38%",
-              }}
-              value={values["released_sig"] ?? ""}
-              onChange={(e) => handle("released_sig", e.target.value)}
-            />
-            <div className="tt-sig-caption">Released By</div>
-          </div>
-          <div className="tt-sig-cell">
-            <input
-              id="noted_sig"
-              type="text"
-              className="tt-field tt-underline tt-sig"
-              style={{
-                left: "34.23%",
-                top: "36.82%",
-                width: "16.81%",
-                height: "2.38%",
-              }}
-              value={values["noted_sig"] ?? ""}
-              onChange={(e) => handle("noted_sig", e.target.value)}
-            />
-            <div className="tt-sig-caption">Noted By</div>
-          </div>
-          <div className="tt-sig-cell">
-            <input
-              id="approved_sig"
-              type="text"
-              className="tt-field tt-underline tt-sig"
-              style={{
-                left: "62.13%",
-                top: "36.82%",
-                width: "16.81%",
-                height: "2.38%",
-              }}
-              value={values["approved_sig"] ?? ""}
-              onChange={(e) => handle("approved_sig", e.target.value)}
-            />
-            <div className="tt-sig-caption">Approved By</div>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Gate Pass dividers */}
-      <div className="tt-gp-divider">SAME PRINTED SHEET</div>
+      <div style={{ textAlign: "center", fontSize: 8, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "#334155", paddingTop: 6, borderTop: "1px solid #999", marginTop: 10 }}>Same Printed Sheet</div>
 
-      {/* Gate Pass 1 */}
-      <div className="tt-section tt-gatepass tt-gp1">
-        <div className="tt-gp-title">GATE PASS</div>
-        <div className="tt-gp-grid">
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Control No.</span>
-            <input
-              id="gp1_control_no"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "10.92%",
-                top: "55.42%",
-                width: "15.69%",
-                height: "0.99%",
-              }}
-              value={values["gp1_control_no"] ?? ""}
-              onChange={(e) => handle("gp1_control_no", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Date</span>
-            <input
-              id="gp1_date"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "30.53%",
-                top: "55.42%",
-                width: "15.69%",
-                height: "0.99%",
-              }}
-              value={values["gp1_date"] ?? ""}
-              onChange={(e) => handle("gp1_date", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Time Out</span>
-            <input
-              id="gp1_time_out"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "8.96%",
-                top: "56.81%",
-                width: "8.4%",
-                height: "0.99%",
-              }}
-              value={values["gp1_time_out"] ?? ""}
-              onChange={(e) => handle("gp1_time_out", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Time In</span>
-            <input
-              id="gp1_time_in"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "30.25%",
-                top: "56.81%",
-                width: "8.4%",
-                height: "0.99%",
-              }}
-              value={values["gp1_time_in"] ?? ""}
-              onChange={(e) => handle("gp1_time_in", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Personnel</span>
-            <input
-              id="gp1_personnel"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "12.32%",
-                top: "58.19%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp1_personnel"] ?? ""}
-              onChange={(e) => handle("gp1_personnel", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Position</span>
-            <input
-              id="gp1_position"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "11.2%",
-                top: "60.77%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp1_position"] ?? ""}
-              onChange={(e) => handle("gp1_position", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Division</span>
-            <input
-              id="gp1_division"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "10.92%",
-                top: "62.15%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp1_division"] ?? ""}
-              onChange={(e) => handle("gp1_division", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Destination</span>
-            <input
-              id="gp1_destination"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "11.77%",
-                top: "63.78%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp1_destination"] ?? ""}
-              onChange={(e) => handle("gp1_destination", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Purpose</span>
-            <input
-              id="gp1_purpose"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "10.92%",
-                top: "66.33%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp1_purpose"] ?? ""}
-              onChange={(e) => handle("gp1_purpose", e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="tt-gp-sigs">
-          <div className="tt-gp-sig-cell">
-            <input
-              id="gp1_employee"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "41.46%",
-                top: "71.02%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp1_employee"] ?? ""}
-              onChange={(e) => handle("gp1_employee", e.target.value)}
-            />
-            <div className="tt-sig-caption-small">Employee's Signature</div>
-          </div>
-          <div className="tt-gp-sig-cell">
-            <input
-              id="gp1_responsible"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "13.45%",
-                top: "72.64%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp1_responsible"] ?? ""}
-              onChange={(e) => handle("gp1_responsible", e.target.value)}
-            />
-            <div className="tt-sig-caption-small">Responsible Person</div>
-          </div>
-          <div className="tt-gp-sig-cell">
-            <input
-              id="gp1_approved"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "33.61%",
-                top: "77.4%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp1_approved"] ?? ""}
-              onChange={(e) => handle("gp1_approved", e.target.value)}
-            />
-            <div className="tt-sig-caption-small">Approved By</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Gate Pass 2 */}
-      <div className="tt-section tt-gatepass tt-gp2">
-        <div className="tt-gp-title">GATE PASS</div>
-        <div className="tt-gp-grid">
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Control No.</span>
-            <input
-              id="gp2_control_no"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "60.22%",
-                top: "55.62%",
-                width: "15.69%",
-                height: "0.99%",
-              }}
-              value={values["gp2_control_no"] ?? ""}
-              onChange={(e) => handle("gp2_control_no", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Date</span>
-            <input
-              id="gp2_date"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "79.27%",
-                top: "55.62%",
-                width: "15.69%",
-                height: "0.99%",
-              }}
-              value={values["gp2_date"] ?? ""}
-              onChange={(e) => handle("gp2_date", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Time Out</span>
-            <input
-              id="gp2_time_out"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "58.77%",
-                top: "57.01%",
-                width: "8.4%",
-                height: "0.99%",
-              }}
-              value={values["gp2_time_out"] ?? ""}
-              onChange={(e) => handle("gp2_time_out", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Time In</span>
-            <input
-              id="gp2_time_in"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "78.65%",
-                top: "57.01%",
-                width: "8.4%",
-                height: "0.99%",
-              }}
-              value={values["gp2_time_in"] ?? ""}
-              onChange={(e) => handle("gp2_time_in", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Personnel</span>
-            <input
-              id="gp2_personnel"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "62.13%",
-                top: "58.39%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp2_personnel"] ?? ""}
-              onChange={(e) => handle("gp2_personnel", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Position</span>
-            <input
-              id="gp2_position"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "61.01%",
-                top: "60.97%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp2_position"] ?? ""}
-              onChange={(e) => handle("gp2_position", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Division</span>
-            <input
-              id="gp2_division"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "61.01%",
-                top: "62.48%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp2_division"] ?? ""}
-              onChange={(e) => handle("gp2_division", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Destination</span>
-            <input
-              id="gp2_destination"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "61.85%",
-                top: "64.06%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp2_destination"] ?? ""}
-              onChange={(e) => handle("gp2_destination", e.target.value)}
-            />
-          </div>
-          <div className="tt-gp-cell">
-            <span className="tt-gp-label">Purpose</span>
-            <input
-              id="gp2_purpose"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "61.01%",
-                top: "66.41%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp2_purpose"] ?? ""}
-              onChange={(e) => handle("gp2_purpose", e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="tt-gp-sigs">
-          <div className="tt-gp-sig-cell">
-            <input
-              id="gp2_employee"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "88.97%",
-                top: "70.86%",
-                width: "11.2%",
-                height: "0.99%",
-              }}
-              value={values["gp2_employee"] ?? ""}
-              onChange={(e) => handle("gp2_employee", e.target.value)}
-            />
-            <div className="tt-sig-caption-small">Employee's Signature</div>
-          </div>
-          <div className="tt-gp-sig-cell">
-            <input
-              id="gp2_responsible"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "70.03%",
-                top: "72.64%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp2_responsible"] ?? ""}
-              onChange={(e) => handle("gp2_responsible", e.target.value)}
-            />
-            <div className="tt-sig-caption-small">Responsible Person</div>
-          </div>
-          <div className="tt-gp-sig-cell">
-            <input
-              id="gp2_approved"
-              type="text"
-              className="tt-field tt-underline tt-small"
-              style={{
-                left: "82.35%",
-                top: "77.95%",
-                width: "14.56%",
-                height: "0.99%",
-              }}
-              value={values["gp2_approved"] ?? ""}
-              onChange={(e) => handle("gp2_approved", e.target.value)}
-            />
-            <div className="tt-sig-caption-small">Approved By</div>
-          </div>
-        </div>
+      {/* Gate passes */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 10 }}>
+        {[1, 2].map((n) => {
+          const p = `gp${n}_`;
+          return (
+            <div key={n} style={{ border: "1px solid #000", padding: "6px 8px" }}>
+              <div style={{ textAlign: "center", fontSize: 10, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6, borderBottom: "1px solid #000", paddingBottom: 3 }}>Gate Pass</div>
+              {[
+                ["Control No.", `${p}control_no`],
+                ["Date", `${p}date`],
+              ].map(([lbl, id]) => (
+                <div key={id} style={{ display: "flex", alignItems: "baseline", gap: 4, fontSize: 8.5, marginBottom: 3 }}>
+                  <span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>{lbl}</span>
+                  <F id={id} values={values} handle={handle} style={{ fontSize: 8.5 }} />
+                </div>
+              ))}
+              <div style={{ display: "flex", gap: 4, fontSize: 8.5, marginBottom: 3 }}>
+                <span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>Time Out</span>
+                <F id={`${p}time_out`} values={values} handle={handle} style={{ fontSize: 8.5 }} />
+                <span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>Time In</span>
+                <F id={`${p}time_in`} values={values} handle={handle} style={{ fontSize: 8.5 }} />
+              </div>
+              {[
+                ["Personnel", `${p}personnel`],
+                ["Position", `${p}position`],
+                ["Division", `${p}division`],
+                ["Destination", `${p}destination`],
+                ["Purpose", `${p}purpose`],
+              ].map(([lbl, id]) => (
+                <div key={id} style={{ display: "flex", alignItems: "baseline", gap: 4, fontSize: 8.5, marginBottom: 3 }}>
+                  <span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>{lbl}</span>
+                  <F id={id} values={values} handle={handle} style={{ fontSize: 8.5 }} />
+                </div>
+              ))}
+              {[
+                ["Employee's Signature", `${p}employee`],
+                ["Responsible Person", `${p}responsible`],
+                ["Approved By", `${p}approved`],
+              ].map(([lbl, id]) => (
+                <div key={id} style={{ display: "flex", alignItems: "baseline", gap: 4, fontSize: 8.5, marginBottom: 3, marginTop: lbl === "Employee's Signature" ? 6 : 0 }}>
+                  <span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>{lbl}</span>
+                  <F id={id} values={values} handle={handle} style={{ fontSize: 8.5 }} />
+                </div>
+              ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

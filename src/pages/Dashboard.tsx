@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import "../styles/dashboard.css";
 import "../styles/typography.css";
 import { useAuth, UserRole } from "../context/AuthContext";
+import Header from "../components/Header";
 import {
   Bell,
   CalendarClock,
@@ -276,8 +277,8 @@ function SectionHeader({
   return (
     <div className="mb-3.5 flex items-start justify-between gap-4">
       <div>
-        <h2 className="typo-title-sm text-slate-900">{title}</h2>
-        {subtitle && <p className="mt-0.5 typo-label-sm text-slate-400">{subtitle}</p>}
+        <h2 className="typo-title-lg text-slate-900">{title}</h2>
+        {subtitle && <p className="mt-0.5 typo-body-lg text-slate-400">{subtitle}</p>}
       </div>
       {link && (
         <button className="section-link" onClick={onLink}>
@@ -352,113 +353,25 @@ export default function App() {
 
   return (
     <Layout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
-      <header className="topbar">
-        <button
-          className="mobile-menu"
-          onClick={() => setSidebarOpen(true)}
-          aria-label="Open menu"
-        >
-          <Menu size={20} />
-        </button>
-        <div className="min-w-0">
-          <div className="flex items-center gap-1.5 typo-label-sm text-slate-400">
-            VISTA <ChevronRight size={10} /> Overview
-          </div>
-          <h1 className="mt-0.5 typo-headline-sm text-slate-900">Dashboard</h1>
-        </div>
-
-        <div className="ml-auto flex items-center gap-2.5">
-          <label className="search-box">
-            <Search size={15} />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search vehicles, orders..."
-              aria-label="Search dashboard"
-            />
-          </label>
-
-          <div className="relative">
-            <button
-              className="topbar-icon"
-              onClick={() => {
-                setNotificationOpen(!notificationOpen);
-                setProfileOpen(false);
-              }}
-              aria-label="Notifications"
-            >
-              <Bell size={17} />
-              <span className="notification-dot" />
-            </button>
-            {notificationOpen && (
-              <div className="dropdown-panel right-0 w-72">
-                <div className="dropdown-heading">Notifications</div>
-                <div className="p-2">
-                  <button
-                    className="notification-card"
-                    onClick={() => notify("Travel order opened")}
-                  >
-                    <span className="notification-icon">
-                      <FileText size={15} />
-                    </span>
-                    <span>
-                      <b>Travel order needs approval</b>
-                      <small>TO-2025-0618-015 · 8 minutes ago</small>
-                    </span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="relative">
-            <button
-              className="profile-button"
-              onClick={() => {
-                setProfileOpen(!profileOpen);
-                setNotificationOpen(false);
-              }}
-            >
-              <div className="avatar">JB</div>
-              <div className="hidden text-left sm:block">
-                <p className="typo-label-sm text-slate-800">
-                  {user?.fullName || "Janine Balayan"}
-                </p>
-                <p className="typo-label-sm text-slate-400">
-                  {userRole || "Administrator"}
-                </p>
-              </div>
-              <ChevronDown size={13} className="hidden text-slate-400 sm:block" />
-            </button>
-            {profileOpen && (
-              <div className="dropdown-panel right-0 w-48 p-1.5">
-                <button className="dropdown-item">
-                  <UserRound size={15} /> My profile
-                </button>
-                <button className="dropdown-item" onClick={() => navigate("/settings")}>
-                  <Settings size={15} /> Account settings
-                </button>
-                <button
-                  className="dropdown-item text-red-600"
-                  onClick={() => {
-                    navigate("/");
-                  }}
-                >
-                  <LogOut size={15} /> Sign out
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+      <Header
+        title="Dashboard"
+        description={undefined}
+        breadcrumb="VISTA / Overview"
+        searchValue={query}
+        onSearchChange={setQuery}
+        searchPlaceholder="Search vehicles, orders..."
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        onNotify={notify}
+      />
 
       <main className="dashboard-main">
         <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>
-            <h2 className="typo-title-sm text-slate-900">
+            <h2 className="typo-title-lg text-slate-900">
               Welcome back, {user?.fullName || "Janine Ganda"}!
             </h2>
-            <p className="mt-1 typo-label-sm text-slate-500">
+            <p className="mt-1 typo-body-lg text-slate-500">
               Here&apos;s an overview of your vehicle operations today.
             </p>
           </div>
@@ -502,7 +415,7 @@ export default function App() {
                 </div>
                 <div className="min-w-0">
                   <p className="typo-label-sm text-slate-500">{item.label}</p>
-                  <p className="mt-1 typo-headline-sm text-slate-900">
+                  <p className="mt-1 typo-headline-md text-slate-900">
                     {item.value}
                   </p>
                   <p className="mt-1.5 truncate typo-label-sm text-slate-400">{item.note}</p>
@@ -546,14 +459,14 @@ export default function App() {
                           <span className="vehicle-icon">
                             <CarFront size={16} />
                           </span>
-                          <b className="typo-label-sm">{item.vehicle}</b>
+                          <b className="typo-body-md">{item.vehicle}</b>
                         </div>
                       </td>
-                      <td className="typo-label-sm">{item.plate}</td>
-                      <td className="typo-label-sm">{item.driver}</td>
-                      <td className="typo-label-sm">{item.destination}</td>
-                      <td className="typo-label-sm">{item.actualDeparture}</td>
-                      <td className="typo-label-sm">{item.expectedReturn}</td>
+                      <td className="typo-body-md">{item.plate}</td>
+                      <td className="typo-body-md">{item.driver}</td>
+                      <td className="typo-body-md">{item.destination}</td>
+                      <td className="typo-body-md">{item.actualDeparture}</td>
+                      <td className="typo-body-md">{item.expectedReturn}</td>
                       <td>
                         <StatusBadge status={item.status as any} />
                       </td>
@@ -603,14 +516,14 @@ export default function App() {
                           <span className="vehicle-icon">
                             <CarFront size={16} />
                           </span>
-                          <b className="typo-label-sm">{item.vehicle}</b>
+                          <b className="typo-body-md">{item.vehicle}</b>
                         </div>
                       </td>
-                      <td className="typo-label-sm">{item.plate}</td>
-                      <td className="typo-label-sm">{item.driver}</td>
-                      <td className="typo-label-sm">{item.department}</td>
-                      <td className="typo-label-sm">{item.scheduleDate}</td>
-                      <td className="typo-label-sm">{item.expectedReturn}</td>
+                      <td className="typo-body-md">{item.plate}</td>
+                      <td className="typo-body-md">{item.driver}</td>
+                      <td className="typo-body-md">{item.department}</td>
+                      <td className="typo-body-md">{item.scheduleDate}</td>
+                      <td className="typo-body-md">{item.expectedReturn}</td>
                       <td>
                         <StatusBadge status={item.status as any} />
                       </td>

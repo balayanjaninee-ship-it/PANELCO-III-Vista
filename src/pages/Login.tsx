@@ -9,19 +9,9 @@ import { useAuth } from "../context/AuthContext";
 
 function Logo() {
   return (
-    <div className="flex items-center justify-start gap-4 whitespace-nowrap">
-      <img
-        src={logoImg}
-        alt="PANELCO III logo"
-        className="-ml-6 -mr-6 h-16 w-auto object-contain mix-blend-multiply sm:h-28 lg:h-32"
-      />
-      <div className="flex flex-col justify-center">
-        <p className="typo-label-sm text-[#0d3448] uppercase tracking-[0.18em] sm:text-[14px]">
-          PANELCO III
-        </p>
-        <p className="mt-2 typo-title-md text-[#168f78] leading-none tracking-[-0.02em] sm:text-[30px]">
-          VIST<span className="text-[#168f78]">A</span>
-        </p>
+    <div className="flex items-start justify-start gap-4 whitespace-nowrap">
+      <div className="flex flex-col justify-start">
+        <img src="/vista-name.jpg" alt="PANELCO III VISTA" className="h-30 w-auto object-contain object-left" />
       </div>
     </div>
   );
@@ -111,8 +101,36 @@ export default function App() {
   }
 
   return (
-    <main className="login-canvas h-screen overflow-hidden px-4 py-1 text-[#112f3d] sm:px-7 sm:py-4 flex items-center justify-center lg:px-12">
-      <div className="login-card mx-auto grid w-full max-w-[1100px] overflow-hidden rounded-[28px] bg-white shadow-[0_28px_70px_rgba(28,53,66,.22)] lg:min-h-[calc(100vh-6rem)] lg:grid-cols-[52%_48%]">
+    <main className="login-canvas relative h-screen overflow-hidden px-4 py-1 text-[#112f3d] sm:px-7 sm:py-4 flex items-center justify-center lg:px-12">
+      <svg className="pointer-events-none absolute inset-0 z-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <radialGradient id="g1" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#159B80" stop-opacity="0.35" />
+            <stop offset="100%" stop-color="#159B80" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="g2" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#F5C518" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#F5C518" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        <circle cx="18" cy="22" r="16" fill="url(#g1)" />
+        <circle cx="18" cy="22" r="8" fill="url(#g2)" />
+        <circle cx="82" cy="78" r="20" fill="url(#g1)" />
+        <circle cx="82" cy="78" r="10" fill="url(#g2)" />
+        <circle cx="50" cy="15" r="14" fill="url(#g1)" />
+        <circle cx="50" cy="15" r="7" fill="url(#g2)" />
+        <circle cx="35" cy="85" r="12" fill="url(#g1)" />
+        <circle cx="35" cy="85" r="6" fill="url(#g2)" />
+        <circle cx="70" cy="40" r="10" fill="url(#g1)" />
+        <circle cx="70" cy="40" r="5" fill="url(#g2)" />
+      </svg>
+      <div className="relative z-10 mx-auto w-full max-w-[900px]">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="rounded-full bg-white p-2 shadow-[0_8px_20px_rgba(28,53,66,.15)]">
+            <img src={logoImg} alt="PANELCO III logo" className="h-12 w-12 object-contain mix-blend-multiply" />
+          </div>
+        </div>
+      <div className="login-card mx-auto grid w-full max-w-[900px] overflow-hidden rounded-[24px] bg-white shadow-[0_24px_60px_rgba(28,53,66,.2)] lg:min-h-[calc(100vh-12rem)] lg:grid-cols-[52%_48%]">
         <section className="flex flex-col px-5 py-1 sm:px-12 sm:py-4 lg:min-h-0 lg:px-16 lg:py-10 xl:px-[78px]">
           <header>
             <Logo />
@@ -122,7 +140,7 @@ export default function App() {
             <div className="w-full max-w-[440px]">
               <div className="mb-1">
                 
-                <h1 className="typo-headline-sm text-[#102e3d] leading-[1.08] tracking-[-0.045em] sm:text-[2.4rem]">
+                <h1 className="typo-headline-sm text-[#102e3d] leading-[1.08] tracking-[-0.045em]">
                   Welcome back.
                   <br />
                   <span className="text-[#F5C518]">
@@ -133,8 +151,13 @@ export default function App() {
                 
               </div>
 
-              <div
-                className="mb-1 grid grid-cols-2 rounded-[14px] bg-[#eef3f3] p-1.5"
+              <p className="mt-2 mb-2 typo-label-sm leading-5 text-[#6b8086] text-left text-justify">
+                Note: Your username is your ID number. Default password is
+                <span className="font-semibold text-[#102e3d]"> 12345</span>. You
+                will be asked to change it after signing in.
+              </p>
+<div
+                className="mt-1 mb-3 grid grid-cols-2 rounded-[10px] bg-[#eef3f3] p-1"
                 role="tablist"
                 aria-label="Account access options"
               >
@@ -143,7 +166,7 @@ export default function App() {
                   role="tab"
                   aria-selected={mode === "signin"}
                   onClick={() => changeMode("signin")}
-                  className={`flex h-10 items-center justify-center rounded-[10px] px-4 text-sm font-semibold transition ${
+                  className={`flex h-7 items-center justify-center rounded-[8px] px-3 text-sm font-semibold transition ${
                     mode === "signin"
                       ? "bg-white text-[#123b4c] shadow-[0_3px_10px_rgba(21,55,68,.09)]"
                       : "text-[#71858c] hover:text-[#254a57]"
@@ -156,7 +179,7 @@ export default function App() {
                   role="tab"
                   aria-selected={mode === "request"}
                   onClick={() => changeMode("request")}
-                  className={`flex h-10 items-center justify-center rounded-[10px] px-4 text-sm font-semibold transition ${
+                  className={`flex h-7 items-center justify-center rounded-[8px] px-3 text-sm font-semibold transition ${
                     mode === "request"
                       ? "bg-white text-[#123b4c] shadow-[0_3px_10px_rgba(21,55,68,.09)]"
                       : "text-[#71858c] hover:text-[#254a57]"
@@ -166,18 +189,13 @@ export default function App() {
                 </button>
               </div>
 
-              <p className="mb-1 typo-label-sm leading-5 text-[#6b8086] text-center">
-                Note: Your username is your ID number. Default password is
-                <span className="font-semibold text-[#102e3d]"> 12345</span>. You
-                will be asked to change it after signing in.
-              </p>
-
+              
               {showChangePassword ? (
                 <div className="space-y-2">
                   <div>
                     <label
                       htmlFor="new-password"
-                      className="mb-1 block typo-label-sm text-[#24434f]"
+                      className="mb-1 block typo-label-md text-[#24434f]"
                     >
                       New Password
                     </label>
@@ -192,7 +210,7 @@ export default function App() {
                         autoComplete="new-password"
                         required
                         placeholder="Enter your new password"
-                        className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-12 typo-body-sm text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
+                        className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-12 typo-body-md text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
                       />
                     </div>
                   </div>
@@ -200,7 +218,7 @@ export default function App() {
                   <div>
                     <label
                       htmlFor="confirm-password"
-                      className="mb-1 block typo-label-sm text-[#24434f]"
+                      className="mb-1 block typo-label-md text-[#24434f]"
                     >
                       Confirm Password
                     </label>
@@ -215,7 +233,7 @@ export default function App() {
                         autoComplete="new-password"
                         required
                         placeholder="Confirm your new password"
-                        className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-12 typo-body-sm text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
+                        className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-12 typo-body-md text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
                       />
                     </div>
                   </div>
@@ -242,7 +260,7 @@ export default function App() {
                       setLoginError("");
                       navigate("/dashboard");
                     }}
-                    className="mt-2 h-[40px] sm:h-[44px] w-full rounded-lg bg-[#176B3A] typo-label-sm text-white shadow-[0_2px_4px_rgba(23,107,58,.3)] transition colors-200 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#168f78] hover:bg-[#F5C518] active:bg-[#F5C518] active:text-[color:var(--panelco-white)] active:shadow-[0_2px_4px_rgba(245,197,24,.3)]"
+                    className="mt-2 h-[40px] sm:h-[44px] w-full rounded-lg bg-[#176B3A] typo-label-lg text-white shadow-[0_2px_4px_rgba(23,107,58,.3)] transition colors-200 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#168f78] hover:bg-[#F5C518] active:bg-[#F5C518] active:text-[color:var(--panelco-white)] active:shadow-[0_2px_4px_rgba(245,197,24,.3)]"
                   >
                     Update Password
                   </button>
@@ -266,7 +284,7 @@ export default function App() {
                   <div>
                     <label
                       htmlFor="username"
-                      className="mb-1 block typo-label-sm text-[#24434f]"
+                      className="mb-1 block typo-label-md text-[#24434f]"
                     >
                       Username
                     </label>
@@ -280,7 +298,7 @@ export default function App() {
                         autoComplete="username"
                         required
                         placeholder="Enter your username"
-                        className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-4 typo-body-sm text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
+                        className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-4 typo-body-md text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
                       />
                     </div>
                   </div>
@@ -288,7 +306,7 @@ export default function App() {
                   <div>
                     <label
                       htmlFor="password"
-                      className="mb-1 block typo-label-sm text-[#24434f]"
+                      className="mb-1 block typo-label-md text-[#24434f]"
                     >
                       Password
                     </label>
@@ -303,7 +321,7 @@ export default function App() {
                         autoComplete="current-password"
                         required
                         placeholder="Enter your password"
-                        className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-12 typo-body-sm text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
+                        className="h-[40px] sm:h-[44px] w-full rounded-lg border border-transparent bg-[#f2f5f5] pl-11 pr-12 typo-body-md text-[#153744] outline-none transition placeholder:text-[#99a8ad] focus:border-[#4bb5a3] focus:bg-white focus:ring-4 focus:ring-[#4bb5a3]/10"
                       />
                       <button
                         type="button"
@@ -341,7 +359,7 @@ export default function App() {
 
                   <button
                     type="submit"
-                    className="mt-2 h-[40px] sm:h-[44px] w-full rounded-lg bg-[#176B3A] typo-label-sm text-white shadow-[0_2px_4px_rgba(23,107,58,.3)] transition colors-200 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#168f78] hover:bg-[#F5C518] active:bg-[#F5C518] active:text-[color:var(--panelco-white)] active:shadow-[0_2px_4px_rgba(245,197,24,.3)]"
+                    className="mt-2 h-[40px] sm:h-[44px] w-full rounded-lg bg-[#176B3A] typo-label-lg text-white shadow-[0_2px_4px_rgba(23,107,58,.3)] transition colors-200 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#168f78] hover:bg-[#F5C518] active:bg-[#F5C518] active:text-[color:var(--panelco-white)] active:shadow-[0_2px_4px_rgba(245,197,24,.3)]"
                   >
                     Sign In
                   </button>
@@ -387,6 +405,7 @@ export default function App() {
             
           </div>
         </section>
+      </div>
       </div>
     </main>
   );

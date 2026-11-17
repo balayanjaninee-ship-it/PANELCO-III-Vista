@@ -7,7 +7,10 @@ import {
   updateVehicleStatus,
 } from '../lib/vehicleservices'
 import Layout from '../components/Layout'
+import Header from '../components/Header'
+import Vehicle3DViewer from "../components/Vehicle3DViewer";
 import '../styles/typography.css'
+import '../styles/dashboard.css'
 import type {
   Vehicle,
   MaintenanceRecord,
@@ -250,14 +253,14 @@ function Field({
 }) {
   return (
     <label className={`block ${className}`}>
-      <span className="mb-1.5 block typo-label-sm text-[#465248]">{label}</span>
+      <span className="mb-1.5 block typo-label-md text-[#465248]">{label}</span>
       {children}
     </label>
   )
 }
 
 const inputClass =
-  'h-10 w-full rounded-lg border border-[#dfe3dc] bg-white px-3 typo-label-sm text-[#202923] outline-none transition placeholder:text-[#9da69f] focus:border-[#176B3A] focus:ring-2 focus:ring-[#176B3A]/10'
+  'h-10 w-full rounded-lg border border-[#dfe3dc] bg-white px-3 typo-body-md text-[#202923] outline-none transition placeholder:text-[#9da69f] focus:border-[#176B3A] focus:ring-2 focus:ring-[#176B3A]/10'
 
 function Modal({
   title,
@@ -285,7 +288,7 @@ function Modal({
         <header className="flex items-start justify-between border-b border-[#e8ebe6] px-6 py-5">
           <div>
             <h2 className="typo-headline-sm text-[#202923]">{title}</h2>
-            {subtitle && <p className="mt-1 typo-label-sm text-[#778078]">{subtitle}</p>}
+            {subtitle && <p className="mt-1 typo-body-lg text-[#778078]">{subtitle}</p>}
           </div>
           <button
             aria-label="Close"
@@ -518,7 +521,7 @@ function VehicleForm({
         <button
           type="button"
           onClick={close}
-          className="rounded-lg border border-[#d9ddd7] bg-white px-4 py-2.5 typo-label-sm text-[#4f5951] hover:bg-[#f4f6f2]"
+          className="rounded-lg border border-[#d9ddd7] bg-white px-4 py-2.5 typo-body-md text-[#4f5951] hover:bg-[#f4f6f2]"
         >
           Cancel
         </button>
@@ -638,6 +641,27 @@ function VehicleDetails({
           )}
         </div>
         <div className="space-y-4 p-5">
+
+<section className="rounded-xl border border-[#e2e6df] bg-white p-5 shadow-[0_1px_2px_rgba(20,40,25,.03)]">
+  <div className="mb-4">
+    <h3 className="typo-label-md text-[#202923]">
+      3D Vehicle Preview
+    </h3>
+    <p className="mt-1 typo-label-sm text-[#879089]">
+      Rotate and inspect the vehicle from different angles.
+    </p>
+  </div>
+
+  <Vehicle3DViewer
+    height="350px"
+    modelScale={1}
+  />
+
+  <p className="mt-3 typo-label-sm text-[#879089]">
+    {vehicle.make} {vehicle.model} · {vehicle.plateNumber}
+  </p>
+</section>
+
           <section className="rounded-xl border border-[#e2e6df] bg-white p-5 shadow-[0_1px_2px_rgba(20,40,25,.03)]">
             <h3 className="mb-4 flex items-center gap-2 typo-label-md text-[#202923]">
               <Icon name="car" className="size-4 text-[#176B3A]" /> Basic Information
@@ -907,7 +931,7 @@ export default function VehicleManagement({
               <h1 className="typo-headline-sm leading-1.2 tracking-[-.035em] text-slate-900">
                 Vehicle Management
               </h1>
-              <p className="mt-[6px] max-w-2xl typo-label-sm text-[#718096]">
+              <p className="mt-[6px] max-w-2xl typo-body-lg text-[#718096]">
                 Manage your fleet vehicles, add new units, and track maintenance schedules.
               </p>
             </div>
@@ -1021,8 +1045,8 @@ export default function VehicleManagement({
                           <td className="px-4 py-4 font-mono typo-label-sm tracking-wide text-[#3c4840]">
                             {vehicle.plateNumber}
                           </td>
-                          <td className="px-4 py-4 typo-label-sm text-[#58635b]">{vehicle.vehicleType}</td>
-                          <td className="px-4 py-4 typo-label-sm text-[#58635b]">{vehicle.department}</td>
+                          <td className="px-4 py-4 typo-body-md text-[#58635b]">{vehicle.vehicleType}</td>
+                          <td className="px-4 py-4 typo-body-md text-[#58635b]">{vehicle.department}</td>
                         <td className="px-4 py-4">
                           <StatusPill value={vehicle.condition} />
                         </td>

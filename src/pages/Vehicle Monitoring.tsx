@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
+import Header from "../components/Header";
 import "../styles/dashboard.css";
 import "../styles/typography.css";
 import { useAuth } from "../context/AuthContext";
@@ -98,15 +99,18 @@ export default function VehicleMonitoring() {
 
   return (
     <Layout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
-      <button
-        className="mobile-menu fixed left-3 top-3 z-40 lg:hidden"
-        onClick={() => setSidebarOpen(true)}
-        aria-label="Open menu"
-      >
-        <span className="text-slate-600">☰</span>
-      </button>
       <main className="dashboard-main floating-menu">
-        <section className="grid gap-4 xl:grid-cols-[1fr_330px]">
+        <div className="mb-6 flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
+          <div>
+            <h1 className="typo-headline-sm leading-1.2 tracking-[-.035em] text-slate-900">
+              Vehicle Monitoring
+            </h1>
+            <p className="mt-[6px] max-w-2xl typo-body-lg text-[#718096]">
+              Track active trips and upcoming schedules.
+            </p>
+          </div>
+        </div>
+        <section className="mt-4 grid gap-4 2xl:grid-cols-[1.1fr_.9fr]">
           <article className="panel min-w-0">
             <SectionHeader
               title="Upcoming Schedules"

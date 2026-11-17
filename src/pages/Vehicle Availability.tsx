@@ -433,7 +433,7 @@ function App() {
             <div className="title-row">
               <h1 className="typo-headline-sm text-slate-900">Vehicle Availability</h1>
             </div>
-            <p className="typo-label-sm text-slate-500">
+            <p className="typo-body-lg text-slate-500">
               Select a vehicle, schedule your trip, and complete the required documents.
             </p>
           </div>
@@ -802,9 +802,7 @@ function VehicleSelection(props: {
           );
         })}
       </div>
-      {props.selected && (
-        <SelectedVehiclePanel vehicle={props.selectedVehicle} onContinue={props.onContinue} />
-      )}
+      <SelectedVehiclePanel vehicle={props.selectedVehicle} onContinue={props.onContinue} />
       <div className="policy-note">
         <Icon name="shield" />
         <div>
@@ -826,7 +824,12 @@ function SelectedVehiclePanel({
   vehicle: (typeof vehicles)[number];
   onContinue: () => void;
 }) {
-  const dates = Array.from({ length: 30 }, (_, i) => i + 1);
+  const now = new Date();
+  const calendarYear = now.getFullYear();
+  const calendarMonth = now.getMonth();
+  const monthName = now.toLocaleString("en-US", { month: "long" });
+  const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+  const dates = Array.from({ length: daysInMonth }, (_, i) => i + 1);
   return (
     <div className="selected-panel">
       <div className="selected-summary">
@@ -842,7 +845,9 @@ function SelectedVehiclePanel({
       <div className="mini-calendar">
         <div className="calendar-head">
           <div>
-            <strong>June 2025</strong>
+            <strong>
+              {monthName} {calendarYear}
+            </strong>
             <span>Vehicle availability</span>
           </div>
           <div className="calendar-legend">
@@ -1618,7 +1623,15 @@ function DocumentModal({
         </div>
         <div className="modal-body">
           {index === 0 ? (
-            <TripTicketForm />
+            <TripTicketForm
+              defaults={{
+                driver_name: "Roberto A. Santos",
+                vehicle: "Toyota Hilux · NBO 4831",
+                destination: "Urdaneta City Substation",
+                purpose: "Routine inspection",
+                date: "June 18, 2025 · 7:30 AM",
+              }}
+            />
           ) : (
             <>
               {index === 2 && (
@@ -1745,7 +1758,15 @@ function PreviewModal({
         </div>
         <div className={`paper-preview${isCombinedSheet ? " with-form" : ""}`}>
           {isCombinedSheet ? (
-            <TripTicketForm />
+            <TripTicketForm
+              defaults={{
+                driver_name: "Roberto A. Santos",
+                vehicle: "Toyota Hilux · NBO 4831",
+                destination: "Urdaneta City Substation",
+                purpose: "Routine inspection",
+                date: "June 18, 2025 · 7:30 AM",
+              }}
+            />
           ) : (
             <>
               <div className="paper-brand">

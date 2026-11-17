@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Layout from "../components/Layout";
-import "../styles/dashboard.css";
-import "../styles/typography.css";
+import Header from "../components/Header";
+import "../styles/vehicle availability.css";
 import { useAuth } from "../context/AuthContext";
 import { Save, Pencil, X, Eye, EyeOff, Lock, KeyRound, Bell } from "lucide-react";
 
@@ -125,7 +125,17 @@ export default function Settings() {
       >
         <span className="text-slate-600">☰</span>
       </button>
-      <main className="dashboard-main floating-menu">
+      <section className="page-heading">
+        <div>
+          <div className="title-row">
+            <h1 className="typo-headline-sm text-slate-900">Settings</h1>
+          </div>
+          <p className="typo-body-lg text-slate-500">
+            Manage your account, security, and preferences.
+          </p>
+        </div>
+      </section>
+      <main className="dashboard-main floating-menu" style={{ paddingTop: 0 }}>
         <div className="mb-4 flex gap-2 border-b border-slate-200">
           <button
             className={`flex items-center gap-2 px-4 py-2 typo-label-sm font-semibold transition border-b-2 ${
@@ -168,7 +178,7 @@ export default function Settings() {
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h3 className="typo-title-sm text-slate-900">Account Settings</h3>
-                <p className="mt-0.5 typo-label-sm text-slate-400">
+                <p className="mt-0.5 typo-body-lg text-slate-400">
                   View and update your profile information.
                 </p>
               </div>
@@ -191,7 +201,7 @@ export default function Settings() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1.5 block typo-label-sm text-slate-500">Full Name</label>
+                <label className="mb-1.5 block typo-label-md text-slate-500">Full Name</label>
                 <input
                   className={inputClass}
                   value={fullName}
@@ -200,7 +210,7 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block typo-label-sm text-slate-500">Employee ID</label>
+                <label className="mb-1.5 block typo-label-md text-slate-500">Employee ID</label>
                 <input
                   className={inputClass}
                   value={employeeId}
@@ -209,7 +219,7 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block typo-label-sm text-slate-500">Department</label>
+                <label className="mb-1.5 block typo-label-md text-slate-500">Department</label>
                 <input
                   className={inputClass}
                   value={department}
@@ -218,7 +228,7 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block typo-label-sm text-slate-500">Position</label>
+                <label className="mb-1.5 block typo-label-md text-slate-500">Position</label>
                 <input
                   className={inputClass}
                   value={position}
@@ -227,7 +237,7 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block typo-label-sm text-slate-500">Email Address</label>
+                <label className="mb-1.5 block typo-label-md text-slate-500">Email Address</label>
                 <input
                   className={inputClass}
                   type="email"
@@ -237,7 +247,7 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block typo-label-sm text-slate-500">Contact Number</label>
+                <label className="mb-1.5 block typo-label-md text-slate-500">Contact Number</label>
                 <input
                   className={inputClass}
                   value={contactNumber}
@@ -277,7 +287,7 @@ export default function Settings() {
               <KeyRound size={18} className="text-[#176B3A]" />
               <div>
                 <h3 className="typo-title-sm text-slate-900">Account Security</h3>
-                <p className="mt-0.5 typo-label-sm text-slate-400">
+                <p className="mt-0.5 typo-body-lg text-slate-400">
                   Change your password and view security activity.
                 </p>
               </div>
@@ -296,7 +306,7 @@ export default function Settings() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <label className="mb-1.5 block typo-label-sm text-slate-500">Current Password</label>
+                <label className="mb-1.5 block typo-label-md text-slate-500">Current Password</label>
                 <div className="group relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9aabb0]">
                     <Lock size={15} />
@@ -319,7 +329,7 @@ export default function Settings() {
                 </div>
               </div>
               <div>
-                <label className="mb-1.5 block typo-label-sm text-slate-500">New Password</label>
+                <label className="mb-1.5 block typo-label-md text-slate-500">New Password</label>
                 <div className="group relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9aabb0]">
                     <Lock size={15} />
@@ -334,7 +344,7 @@ export default function Settings() {
                 </div>
               </div>
               <div>
-                <label className="mb-1.5 block typo-label-sm text-slate-500">Confirm New Password</label>
+                <label className="mb-1.5 block typo-label-md text-slate-500">Confirm New Password</label>
                 <div className="group relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9aabb0]">
                     <Lock size={15} />
@@ -362,13 +372,13 @@ export default function Settings() {
 
             <div className="mt-5 grid gap-3 border-t border-slate-100 pt-4 sm:grid-cols-2">
               <div className="rounded-lg bg-slate-50 px-4 py-3">
-                <p className="typo-label-sm text-slate-400">Last Password Change</p>
+                <p className="typo-body-lg text-slate-400">Last Password Change</p>
                 <p className="mt-1 typo-body-sm font-semibold text-slate-700">
                   {user?.lastPasswordChange || "—"}
                 </p>
               </div>
               <div className="rounded-lg bg-slate-50 px-4 py-3">
-                <p className="typo-label-sm text-slate-400">Last Login</p>
+                <p className="typo-body-lg text-slate-400">Last Login</p>
                 <p className="mt-1 typo-body-sm font-semibold text-slate-700">
                   {user?.lastLogin || "—"}
                 </p>
@@ -384,7 +394,7 @@ export default function Settings() {
               <Bell size={18} className="text-[#176B3A]" />
               <div>
                 <h3 className="typo-title-sm text-slate-900">Notifications</h3>
-                <p className="mt-0.5 typo-label-sm text-slate-400">
+                <p className="mt-0.5 typo-body-lg text-slate-400">
                   Manage which notifications you receive.
                 </p>
               </div>

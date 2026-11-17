@@ -1,4 +1,4 @@
-import { useState, type ElementType } from "react";
+import { useState, useEffect, type ElementType } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/typography.css";
 import { useAuth } from "../context/AuthContext";
@@ -90,7 +90,7 @@ function Logo() {
         />
       </div>
       <div className="flex flex-col justify-center">
-        <p className="typo-label-sm text-white/80 uppercase tracking-[0.18em]">
+        <p className="text-sidebar text-white/80 uppercase tracking-[0.18em]">
           PANELCO III
         </p>
         <p className="mt-1 typo-title-md text-white leading-none tracking-[-0.02em]">
@@ -114,7 +114,7 @@ export function Sidebar({
   maxStage?: number;
   onStageChange?: (stage: number) => void;
 }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
   const onVehiclePage = location.pathname === "/vehicle-availability";
   const userRole = user?.role;
@@ -124,6 +124,21 @@ export function Sidebar({
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     "Vehicle Availability": false,
   });
+  useEffect(() => {
+    const path = location.pathname;
+    const routeToLabel: Record<string, string> = {
+      "/dashboard": "Dashboard",
+      "/vehicle-availability": "Vehicle Selection",
+      "/vehicle-monitoring": "Vehicle Monitoring",
+      "/vehicle-management": "Vehicle Management",
+      "/user-management": "User Management",
+      "/settings": "Settings",
+    };
+    if (routeToLabel[path]) setActive(routeToLabel[path]);
+    if (path === "/vehicle-availability") {
+      setExpanded((current) => ({ ...current, "Vehicle Availability": true }));
+    }
+  }, [location.pathname]);
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
 
@@ -201,7 +216,7 @@ export function Sidebar({
                     aria-expanded={isExpanded}
                   >
                     <Icon size={17} strokeWidth={1.8} />
-                    <span className="typo-label-sm">{item.label}</span>
+                    <span className="text-sidebar">{item.label}</span>
                     <ChevronDown
                       size={13}
                       className={`ml-auto transition-transform ${isExpanded ? "" : "-rotate-90"}`}
@@ -237,7 +252,7 @@ export function Sidebar({
                             ) : (
                               <ChildIcon size={14} strokeWidth={1.7} />
                             )}
-                            <span className="typo-label-sm">{child.label}</span>
+                            <span className="text-sidebar">{child.label}</span>
                           </button>
                         );
                       })}
@@ -253,11 +268,25 @@ export function Sidebar({
                 onClick={() => selectPage(item.label)}
               >
                 <Icon size={17} strokeWidth={1.8} />
-                <span className="typo-label-sm">{item.label}</span>
+                <span className="text-sidebar">{item.label}</span>
               </button>
             );
           })}
         </nav>
+        <div className="border-t border-white/15 px-4 py-4">
+          <button
+            type="button"
+            className="nav-item"
+            onClick={() => {
+              logout();
+              onClose();
+              navigate("/");
+            }}
+          >
+            <LogOut size={17} strokeWidth={1.8} />
+            <span className="text-sidebar">Logout</span>
+          </button>
+        </div>
       </aside>
     </>
   );

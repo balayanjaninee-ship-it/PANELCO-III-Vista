@@ -55,7 +55,23 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             path="/vehicle-management"
             element={
               <RoleGuard>
-                <VehicleManagement initialVehicles={[]} initialMaintenance={[]} />
+                <VehicleManagement initialVehicles={[{
+                  id: "VH-001",
+                  make: "Commuter",
+                  model: "Van",
+                  plateNumber: "NCR 1001",
+                  vehicleType: "Van",
+                  department: "General Services",
+                  status: "Available",
+                  yearModel: 2024,
+                  color: "White",
+                  fuelType: "Diesel",
+                  seatingCapacity: 15,
+                  registrationExpiration: "2025-12-31",
+                  insuranceExpiration: "2025-12-31",
+                  condition: "Good",
+                  supportingDocuments: [],
+                }]} initialMaintenance={[]} />
               </RoleGuard>
             }
           />
