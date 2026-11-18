@@ -8,7 +8,7 @@ import {
 } from '../lib/vehicleservices'
 import Layout from '../components/Layout'
 import Header from '../components/Header'
-import Vehicle3DViewer from "../components/Vehicle3DViewer";
+import ToyotaHiAceViewer from "../components/ToyotaHiAceViewer";
 import '../styles/typography.css'
 import '../styles/dashboard.css'
 import type {
@@ -652,10 +652,7 @@ function VehicleDetails({
     </p>
   </div>
 
-  <Vehicle3DViewer
-    height="350px"
-    modelScale={1}
-  />
+  <ToyotaHiAceViewer height="350px" />
 
   <p className="mt-3 typo-label-sm text-[#879089]">
     {vehicle.make} {vehicle.model} · {vehicle.plateNumber}

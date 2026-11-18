@@ -2,12 +2,20 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import TripTicketForm from "../components/TripTicketForm";
+import FourViewDamageSketch from "./components/FourViewDamageSketch";
 import { Menu } from "lucide-react";
 import "../styles/vehicle availability.css";
 import "../styles/dashboard.css";
 import "../styles/typography.css"; 
 
 type Stage = 0 | 1 | 2 | 3;
+
+type DamageMark = {
+  id: string;
+  view: 'front' | 'rear' | 'left' | 'right';
+  x: number;
+  y: number;
+};
 type IconName =
   | "grid"
   | "calendar"
@@ -355,6 +363,7 @@ function App() {
   const [maxStage, setMaxStage] = useState<Stage>(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [preparedDocs, setPreparedDocs] = useState<boolean[]>([false, false, false, false]);
+  const [damageMarks, setDamageMarks] = useState<DamageMark[]>([]);
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("All Departments");
   const [vehicleType, setVehicleType] = useState("All Types");
@@ -506,6 +515,10 @@ function App() {
           index={activeModal}
           onClose={() => setActiveModal(null)}
           onComplete={() => prepareDocument(activeModal)}
+          vehiclePlate={selectedVehicle.plate}
+          vehicleModel={`${selectedVehicle.name} · ${selectedVehicle.model}`}
+          damageMarks={damageMarks}
+          onDamageMarksChange={setDamageMarks}
         />
       )}
       {previewModal !== null && (
@@ -1580,10 +1593,18 @@ function DocumentModal({
   index,
   onClose,
   onComplete,
+  vehiclePlate,
+  vehicleModel,
+  damageMarks,
+  onDamageMarksChange,
 }: {
   index: number;
   onClose: () => void;
   onComplete: () => void;
+  vehiclePlate?: string;
+  vehicleModel?: string;
+  damageMarks: DamageMark[];
+  onDamageMarksChange: (marks: DamageMark[]) => void;
 }) {
   const doc = documentData[index];
 
@@ -1661,23 +1682,12 @@ function DocumentModal({
             </div>
           )}
           {index === 3 && (
-            <div>
-              <div className="sketch-instruction">
-                <Icon name="edit" /> Click a vehicle view to place a damage marker. No existing
-                damage has been recorded.
-              </div>
-              <div className="sketch-grid">
-                {["FRONT VIEW", "REAR VIEW", "LEFT-SIDE VIEW", "RIGHT-SIDE VIEW"].map((view) => (
-                  <button key={view}>
-                    <span className="car-sketch">
-                      <Icon name="car" size={58} />
-                    </span>
-                    <strong>{view}</strong>
-                    <small>Click to mark damage</small>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <FourViewDamageSketch
+              initialMarks={damageMarks}
+              onMarksChange={onDamageMarksChange}
+              vehiclePlate={vehiclePlate}
+              vehicleModel={vehicleModel}
+            />
           )}
           {index === 1 && (
             <div className="modal-form-grid">
