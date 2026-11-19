@@ -29,6 +29,9 @@ function RoleGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+window.addEventListener("error", (e) => { try { alert("Global error: " + (e?.error?.stack || e?.message)); } catch {} });
+window.addEventListener("unhandledrejection", (e) => { try { alert("Unhandled rejection: " + (e?.reason?.stack || e?.reason)); } catch {} });
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider>
