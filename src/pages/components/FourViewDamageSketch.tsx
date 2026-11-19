@@ -121,10 +121,11 @@ export default function FourViewDamageSketch({
       if (rotateMode) return;
       const el = overlayRef.current;
       if (!el) return;
-      // Debug: confirm handler fires on device
-      try { window.alert('mark handler fired'); } catch {}
+      try {
+        // Debug: confirm handler fires on device
+        window.alert('mark handler fired');
 
-      const rect = el.getBoundingClientRect();
+        const rect = el.getBoundingClientRect();
       const fallbackX = (clientX - rect.left) / rect.width;
       const fallbackY = (clientY - rect.top) / rect.height;
 
@@ -161,6 +162,9 @@ export default function FourViewDamageSketch({
         onMarksChange?.(next);
         return next;
       });
+      } catch (err) {
+        try { window.alert('mark error: ' + String(err)); } catch {}
+      }
     },
     [azimuthDeg, getViewFromAzimuth, is360, selectedView, rotateMode, onMarksChange]
   );
