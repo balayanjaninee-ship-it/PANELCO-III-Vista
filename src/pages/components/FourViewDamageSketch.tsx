@@ -121,11 +121,7 @@ export default function FourViewDamageSketch({
       if (rotateMode) return;
       const el = overlayRef.current;
       if (!el) return;
-      try {
-        // Debug: confirm handler fires on device
-        window.alert('mark handler fired');
-
-        const rect = el.getBoundingClientRect();
+      const rect = el.getBoundingClientRect();
       const fallbackX = (clientX - rect.left) / rect.width;
       const fallbackY = (clientY - rect.top) / rect.height;
 
@@ -151,21 +147,20 @@ export default function FourViewDamageSketch({
       }
 
       const newMark: DamageMark = {
-        id: crypto.randomUUID(),
+        id: (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+          ? crypto.randomUUID()
+          : 'mark-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10),
         view,
         x: nx,
         y: ny,
       };
-      try { window.alert('mark created: ' + view + ' ' + nx.toFixed(2) + ' ' + ny.toFixed(2)); } catch {}
+
 
       setDamageMarks((prev) => {
         const next = [...prev, newMark];
         onMarksChange?.(next);
         return next;
       });
-      } catch (err) {
-        try { window.alert('mark error: ' + String(err)); } catch {}
-      }
     },
     [azimuthDeg, getViewFromAzimuth, is360, selectedView, rotateMode, onMarksChange]
   );
