@@ -527,6 +527,7 @@ function App() {
               showToast={showToast}
               signatories={orderedSignatories}
               submitted={reservationSubmitted}
+              damageMarks={damageMarks}
               onSubmit={() => {
                 setReservationSubmitted(true);
                 showToast("Reservation record and PDF package created.");
@@ -1300,6 +1301,7 @@ function Review({
   showToast,
   signatories,
   submitted,
+  damageMarks = [],
   onSubmit,
 }: {
   vehicle: (typeof vehicles)[number];
@@ -1308,6 +1310,7 @@ function Review({
   showToast: (s: string) => void;
   signatories: Signatory[][];
   submitted: boolean;
+  damageMarks?: DamageMark[];
   onSubmit: () => void;
 }) {
   if (submitted) {
