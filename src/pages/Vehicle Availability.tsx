@@ -1640,7 +1640,8 @@ function ReservationRecord({
             }
           `}</style>
           <h1 style={{ textAlign: "center" }}>VH-2025-0618-024 — Trip Documents</h1>
-          <h2>Daily Driver’s Trip Ticket + Gate Pass</h2>
+          <div style={{ pageBreakAfter: "always" }}>
+            <h2>Daily Driver’s Trip Ticket + Gate Pass</h2>
           <TripTicketForm
             defaults={{
               driver_name: "Roberto A. Santos",
@@ -1650,7 +1651,9 @@ function ReservationRecord({
               date: "June 18, 2025 · 7:30 AM",
             }}
           />
-          <h2>Vehicle Inspection Checklist</h2>
+          </div>
+          <div style={{ pageBreakAfter: "always" }}>
+            <h2>Vehicle Inspection Checklist</h2>
           <ul>
             {[
               "Tire condition and pressure",
@@ -1665,7 +1668,9 @@ function ReservationRecord({
               <li key={item}>{item} — Good</li>
             ))}
           </ul>
-          <h2>Four-View Vehicle Sketch</h2>
+          </div>
+          <div style={{ pageBreakAfter: "always" }}>
+            <h2>Four-View Vehicle Sketch</h2>
           <FourViewDamageSketch
             initialMarks={damageMarks}
             onMarksChange={() => {}}
@@ -1673,6 +1678,7 @@ function ReservationRecord({
             vehicleModel={`${vehicle.name} · ${vehicle.model}`}
           />
         </div>
+      </div>
       )}
     </>
   );
