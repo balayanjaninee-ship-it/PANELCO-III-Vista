@@ -411,12 +411,17 @@ export default function FourViewDamageSketch({
           <div
             ref={overlayRef}
             onClick={(e) => placeMarkAt(e.clientX, e.clientY)}
-            onTouchEnd={(e) => {
+            onPointerDown={(e) => {
+              (e.currentTarget as HTMLDivElement).dataset.downX = String(e.clientX);
+              (e.currentTarget as HTMLDivElement).dataset.downY = String(e.clientY);
+            }}
+            onPointerUp={(e) => {
               if (rotateMode) return;
-              const t = e.changedTouches?.[0];
-              if (t) {
-                e.preventDefault();
-                placeMarkAt(t.clientX, t.clientY);
+              const downX = Number((e.currentTarget as HTMLDivElement).dataset.downX || e.clientX);
+              const downY = Number((e.currentTarget as HTMLDivElement).dataset.downY || e.clientY);
+              const moved = Math.hypot(e.clientX - downX, e.clientY - downY);
+              if (moved < 12) {
+                placeMarkAt(e.clientX, e.clientY);
               }
             }}
             style={{
