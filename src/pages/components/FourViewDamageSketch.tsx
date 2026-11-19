@@ -121,6 +121,8 @@ export default function FourViewDamageSketch({
       if (rotateMode) return;
       const el = overlayRef.current;
       if (!el) return;
+      // Debug: confirm handler fires on device
+      try { window.alert('mark handler fired'); } catch {}
 
       const rect = el.getBoundingClientRect();
       const fallbackX = (clientX - rect.left) / rect.width;
