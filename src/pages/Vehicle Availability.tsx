@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import TripTicketForm from "../components/TripTicketForm";
@@ -356,6 +356,31 @@ const orderedSignatories = [
   initialSignatories[1],
   initialSignatories[2],
 ];
+
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { error: Error | null }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  componentDidCatch(error: Error) {
+    // eslint-disable-next-line no-console
+    console.error("Document 4 crash:", error);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: 16, color: "#991b1b", background: "#fef2f2", borderRadius: 8 }}>
+          <strong>Failed to render Four-View sketch:</strong>
+          <pre style={{ whiteSpace: "pre-wrap", fontSize: 12 }}>{String(this.state.error?.stack || this.state.error)}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -1682,12 +1707,14 @@ function DocumentModal({
             </div>
           )}
           {index === 3 && (
-            <FourViewDamageSketch
-              initialMarks={damageMarks}
-              onMarksChange={onDamageMarksChange}
-              vehiclePlate={vehiclePlate}
-              vehicleModel={vehicleModel}
-            />
+            <ErrorBoundary>
+              <FourViewDamageSketch
+                initialMarks={damageMarks}
+                onMarksChange={onDamageMarksChange}
+                vehiclePlate={vehiclePlate}
+                vehicleModel={vehicleModel}
+              />
+            </ErrorBoundary>
           )}
           {index === 1 && (
             <div className="modal-form-grid">
