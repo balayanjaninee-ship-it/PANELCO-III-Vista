@@ -9,6 +9,7 @@ import {
 import Layout from '../components/Layout'
 import Header from '../components/Header'
 import ToyotaHiAceViewer from "../components/ToyotaHiAceViewer";
+import FourViewDamageSketch from "./components/FourViewDamageSketch";
 import '../styles/typography.css'
 import '../styles/dashboard.css'
 import type {
@@ -657,6 +658,19 @@ function VehicleDetails({
   <p className="mt-3 typo-label-sm text-[#879089]">
     {vehicle.make} {vehicle.model} · {vehicle.plateNumber}
   </p>
+</section>
+
+<section className="rounded-xl border border-[#e2e6df] bg-white p-5 shadow-[0_1px_2px_rgba(20,40,25,.03)]">
+  <div className="mb-4">
+    <h3 className="typo-label-md text-[#202923]">Four-View Vehicle Sketch</h3>
+    <p className="mt-1 typo-label-sm text-[#879089]">
+      Inspect and mark vehicle damage from the four standard views.
+    </p>
+  </div>
+  <FourViewDamageSketch
+    vehiclePlate={vehicle.plateNumber}
+    vehicleModel={`${vehicle.make} ${vehicle.model}`}
+  />
 </section>
 
           <section className="rounded-xl border border-[#e2e6df] bg-white p-5 shadow-[0_1px_2px_rgba(20,40,25,.03)]">

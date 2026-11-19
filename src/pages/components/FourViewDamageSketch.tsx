@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { HiAceViewportEngine } from '@/scene/HiAceViewportEngine';
 import { HiAceSceneState, CameraViewId } from '@/types/hiace';
+import ToyotaHiAceViewer from '@/components/ToyotaHiAceViewer';
 
 type DamageMark = {
   id: string;
@@ -38,6 +39,36 @@ export default function FourViewDamageSketch({
   const [azimuthDeg, setAzimuthDeg] = useState(0);
   const [is360, setIs360] = useState(false);
   const [printMode, setPrintMode] = useState(false);
+  const [rotateMode, setRotateMode] = useState(false);
+  const [selectedMarkId, setSelectedMarkId] = useState<string | null>(null);
+
+  // Native touch listeners (React's synthetic touch events are passive on some
+  // browsers, which prevents preventDefault and breaks tap-to-mark on mobile).
+  useEffect(() => {
+    const el = overlayRef.current;
+    if (!el) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (rotateMode) return;
+      // Prevent the browser from interpreting the touch as scroll/zoom
+      e.preventDefault();
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (rotateMode) return;
+      const t = e.changedTouches && e.changedTouches[0];
+      if (t) {
+        e.preventDefault();
+        placeMarkAt(t.clientX, t.clientY);
+      }
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: false });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [rotateMode, placeMarkAt]);
   const canvasMountRef = useRef<HTMLDivElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const engineRef = useRef<HiAceViewportEngine | null>(null);
@@ -112,28 +143,51 @@ export default function FourViewDamageSketch({
     return 'right';
   }, []);
 
-  const handleOverlayClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+  const placeMarkAt = useCallback(
+    (clientX: number, clientY: number) => {
+      if (rotateMode) return;
       const el = overlayRef.current;
       if (!el) return;
 
       const rect = el.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = (e.clientY - rect.top) / rect.height;
+      const fallbackX = (clientX - rect.left) / rect.width;
+      const fallbackY = (clientY - rect.top) / rect.height;
 
-      const view = getViewFromAzimuth(azimuthDeg);
+      let view: ViewKey;
+      let nx: number;
+      let ny: number;
+
+      if (is360) {
+        const resolved = engineRef.current?.resolveDamageMark(clientX, clientY);
+        if (resolved) {
+          view = resolved.view;
+          nx = resolved.x;
+          ny = resolved.y;
+        } else {
+          view = getViewFromAzimuth(azimuthDeg);
+          nx = Math.max(0, Math.min(1, fallbackX));
+          ny = Math.max(0, Math.min(1, fallbackY));
+        }
+      } else {
+        view = selectedView;
+        nx = Math.max(0, Math.min(1, fallbackX));
+        ny = Math.max(0, Math.min(1, fallbackY));
+      }
 
       const newMark: DamageMark = {
         id: crypto.randomUUID(),
         view,
-        x: Math.max(0, Math.min(1, x)),
-        y: Math.max(0, Math.min(1, y)),
+        x: nx,
+        y: ny,
       };
 
-      setDamageMarks((prev) => [...prev, newMark]);
-      onMarksChange?.([...damageMarks, newMark]);
+      setDamageMarks((prev) => {
+        const next = [...prev, newMark];
+        onMarksChange?.(next);
+        return next;
+      });
     },
-    [azimuthDeg, getViewFromAzimuth, damageMarks, onMarksChange]
+    [azimuthDeg, getViewFromAzimuth, is360, selectedView, rotateMode, onMarksChange]
   );
 
   const removeMark = useCallback((id: string) => {
@@ -301,7 +355,11 @@ export default function FourViewDamageSketch({
 
   // ---- Edit mode: 3D inspection + four-view sketch panels ----
   return (
-    <div className="four-view-damage-sketch" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <div
+      className="four-view-damage-sketch"
+      style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+      onClick={() => setSelectedMarkId(null)}
+    >
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 8px' }}>
         <div>
@@ -349,22 +407,36 @@ export default function FourViewDamageSketch({
           ref={canvasMountRef}
           style={{ width: '100%', height: '340px', minHeight: 0, position: 'relative' }}
         >
-          {/* Click overlay — captures clicks on the 360° view to place damage markers */}
+          {/* Click overlay — captures clicks to place damage markers (disabled while rotating) */}
           <div
             ref={overlayRef}
-            onClick={handleOverlayClick}
+            onClick={(e) => placeMarkAt(e.clientX, e.clientY)}
+            onTouchEnd={(e) => {
+              if (rotateMode) return;
+              const t = e.changedTouches?.[0];
+              if (t) {
+                e.preventDefault();
+                placeMarkAt(t.clientX, t.clientY);
+              }
+            }}
             style={{
               position: 'absolute',
               inset: 0,
-              cursor: 'crosshair',
+              cursor: rotateMode ? 'grab' : 'crosshair',
               zIndex: 5,
               background: 'transparent',
+              pointerEvents: rotateMode ? 'none' : 'auto',
+              touchAction: 'none',
             }}
           />
         </div>
         <div style={{ padding: '10px', background: '#0e1218', borderTop: '1px solid #1a1f24', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
           <div style={{ fontSize: '11px', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            360° Three-D Inspection · Click to mark damage
+            {rotateMode
+              ? 'Rotate/Pan Mode — drag to orbit the vehicle'
+              : is360
+              ? `360° Inspection — marks go to ${getViewFromAzimuth(azimuthDeg).toUpperCase()} view`
+              : `Single View — marks go to ${selectedView.toUpperCase()} view`}
           </div>
           <div style={{ display: 'flex', gap: '6px' }}>
             <button
@@ -396,6 +468,21 @@ export default function FourViewDamageSketch({
               360° View
             </button>
             <button
+              onClick={() => setRotateMode((r) => !r)}
+              style={{
+                padding: '4px 10px',
+                fontSize: '11px',
+                background: rotateMode ? '#b45309' : '#161b24',
+                color: '#ffffff',
+                border: rotateMode ? '1px solid #f59e0b' : '1px solid #2a2e33',
+                borderRadius: '6px',
+                cursor: 'pointer',
+              }}
+              title={rotateMode ? 'Click to switch back to marking damages' : 'Click to rotate/pan the vehicle without placing marks'}
+            >
+              {rotateMode ? 'Rotate Mode' : 'Mark Mode'}
+            </button>
+            <button
               onClick={() => {
                 const engine = engineRef.current;
                 engine?.updateState({ ...INITIAL_STATE, autoSpin: false, slidingDoorOpen: false, tailgateOpen: false });
@@ -419,131 +506,117 @@ export default function FourViewDamageSketch({
         </div>
       </div>
 
-      {/* Four-View Sketch Grid — marks appear here based on view assigned during 3D click */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
-        {['front', 'rear', 'left', 'right'].map((viewKey) => {
-          const view = viewKey as ViewKey;
-          const config = VIEW_CONFIG[view];
-          const marks = marksForView(view);
-          const isActive = selectedView === view;
+      {/* Four-View Sketch Grid — single quad 3D view + overlaid damage marks */}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '4 / 3',
+          borderRadius: '10px',
+          overflow: 'hidden',
+          border: '2px solid #e1e6e1',
+          background: '#11151b',
+        }}
+      >
+        <ToyotaHiAceViewer height="100%" layoutMode="quad" hideControls />
 
-          return (
-            <div
-              key={viewKey}
+        {/* Quadrant divider lines */}
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2 }}>
+          <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: '1px', background: 'rgba(255,255,255,0.25)' }} />
+          <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: 'rgba(255,255,255,0.25)' }} />
+        </div>
+
+        {/* Quadrant labels */}
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 3 }}>
+          {([
+            { view: 'right', label: 'RIGHT SIDE VIEW', x: '25%', y: '8px' },
+            { view: 'left', label: 'LEFT SIDE VIEW', x: '75%', y: '8px' },
+            { view: 'front', label: 'FRONT VIEW', x: '25%', y: '50%' },
+            { view: 'rear', label: 'REAR VIEW', x: '75%', y: '50%' },
+          ] as const).map((q) => (
+            <span
+              key={q.view}
               style={{
-                border: `2px solid ${isActive ? '#176B3A' : '#e1e6e1'}`,
-                borderRadius: '10px',
-                overflow: 'hidden',
-                background: '#ffffff',
+                position: 'absolute',
+                left: q.x,
+                top: q.y,
+                transform: 'translateX(-50%)',
+                fontSize: '10px',
+                fontWeight: 700,
+                color: '#ffffff',
+                textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+                letterSpacing: '0.5px',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#f5f6f3', borderBottom: '1px solid #e1e6e1' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#11151b' }}>{config.label}</span>
-                <button
-                  onClick={() => setSelectedView(view)}
-                  style={{
-                    padding: '4px 8px',
-                    fontSize: '10px',
-                    background: isActive ? '#176B3A' : '#ffffff',
-                    color: isActive ? '#ffffff' : '#666',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {isActive ? 'Active' : 'Select'}
-                </button>
-              </div>
+              {q.label}
+            </span>
+          ))}
+        </div>
 
-              <div
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  aspectRatio: '4 / 3',
-                  background: '#f8faf9',
-                }}
-              >
-                {/* Car silhouette */}
-                <svg
+        {/* Damage marks overlaid on each quadrant */}
+        {(['front', 'rear', 'left', 'right'] as ViewKey[]).map((view) => {
+          const qOrigin: Record<ViewKey, { x: number; y: number }> = {
+            right: { x: 0, y: 0 },
+            left: { x: 0.5, y: 0 },
+            front: { x: 0, y: 0.5 },
+            rear: { x: 0.5, y: 0.5 },
+          };
+          const origin = qOrigin[view];
+          return marksForView(view).map((mark) => (
+            <div
+              key={mark.id}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedMarkId((prev) => (prev === mark.id ? null : mark.id));
+              }}
+              style={{
+                position: 'absolute',
+                left: `${(origin.x + mark.x * 0.5) * 100}%`,
+                top: `${(origin.y + mark.y * 0.5) * 100}%`,
+                transform: 'translate(-50%, -50%)',
+                width: '22px',
+                height: '22px',
+                pointerEvents: 'auto',
+                zIndex: 10,
+                cursor: 'pointer',
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" style={{ display: 'block' }}>
+                <circle cx="12" cy="12" r="9" fill="none" stroke={MARK_COLOR} strokeWidth="2.5" />
+              </svg>
+              {selectedMarkId === mark.id && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeMark(mark.id);
+                    setSelectedMarkId(null);
+                  }}
                   style={{
                     position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '70%',
-                    height: '70%',
-                    display: 'block',
-                    pointerEvents: 'none',
+                    top: '-8px',
+                    right: '-8px',
+                    width: '18px',
+                    height: '18px',
+                    background: '#dc2626',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '50%',
+                    fontSize: '11px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    lineHeight: '1',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
                   }}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#9ca3af"
-                  strokeWidth="1.5"
+                  title="Remove damage mark"
                 >
-                  <path d="M2 4h20v14H2z" />
-                  <path d="M4 4h16v2H4z" />
-                  <path d="M3 18h18v-2H3z" />
-                  <circle cx="6" cy="16" r="1.5" stroke="#6b7280" strokeWidth="1" fill="none" />
-                  <circle cx="18" cy="16" r="1.5" stroke="#6b7280" strokeWidth="1" fill="none" />
-                </svg>
-
-                {/* Damage markers — simple circles, no center dot */}
-                {marks.map((mark) => (
-                  <div
-                    key={mark.id}
-                    style={{
-                      position: 'absolute',
-                      left: `${mark.x * 100}%`,
-                      top: `${mark.y * 100}%`,
-                      transform: 'translate(-50%, -50%)',
-                      width: '22px',
-                      height: '22px',
-                      pointerEvents: 'none',
-                      zIndex: 10,
-                    }}
-                  >
-                    <svg viewBox="0 0 24 24" width="22" height="22" style={{ display: 'block' }}>
-                      <circle cx="12" cy="12" r="9" fill="none" stroke={MARK_COLOR} strokeWidth="2.5" />
-                    </svg>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeMark(mark.id);
-                      }}
-                      style={{
-                        position: 'absolute',
-                        top: '-6px',
-                        right: '-6px',
-                        width: '16px',
-                        height: '16px',
-                        background: '#dc2626',
-                        color: '#ffffff',
-                        border: 'none',
-                        borderRadius: '50%',
-                        fontSize: '10px',
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        lineHeight: '1',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
-                      }}
-                      title="Remove damage mark"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f5f6f3', borderTop: '1px solid #e1e6e1' }}>
-                <span style={{ fontSize: '11px', color: '#666' }}>
-                  {marks.length} mark{marks.length !== 1 ? 's' : ''}
-                </span>
-              </div>
+                  ✕
+                </button>
+              )}
             </div>
-          );
+          ));
         })}
       </div>
 

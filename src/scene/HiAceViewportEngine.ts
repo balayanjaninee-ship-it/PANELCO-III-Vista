@@ -395,6 +395,60 @@ export class HiAceViewportEngine {
     this.requestRender();
   }
 
+  /**
+   * Resolve a pointer position (in 360° view) to a damage mark's view + normalized
+   * coordinates, by raycasting the vehicle and projecting the hit point onto the
+   * corresponding orthographic elevation. Returns null if nothing was hit.
+   */
+  public resolveDamageMark(clientX: number, clientY: number): {
+    view: 'front' | 'rear' | 'left' | 'right';
+    x: number;
+    y: number;
+  } | null {
+    if (this.state.layoutMode !== '360') return null;
+
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    const px = clientX - rect.left;
+    const py = clientY - rect.top;
+    const paneW = Math.max(rect.width, 1);
+    const paneH = Math.max(rect.height, 1);
+
+    _mouseNdc.x = (px / paneW) * 2 - 1;
+    _mouseNdc.y = -(py / paneH) * 2 + 1;
+
+    this.perspCamera.aspect = paneW / paneH;
+    this.perspCamera.updateProjectionMatrix();
+    this.raycaster.setFromCamera(_mouseNdc, this.perspCamera);
+
+    const hits = this.raycaster.intersectObjects(this.model.root, true);
+    if (hits.length === 0) return null;
+    const point = hits[0].point;
+
+    // Derive damage view from current azimuth
+    const dx = this.perspCamera.position.x - this.controls.target.x;
+    const dz = this.perspCamera.position.z - this.controls.target.z;
+    const rawDeg = THREE.MathUtils.radToDeg(Math.atan2(dx, dz));
+    const a = ((Math.round(rawDeg) % 360) + 360) % 360;
+    let view: 'front' | 'rear' | 'left' | 'right';
+    if (a >= 345 || a < 15) view = 'front';
+    else if (a >= 165 && a <= 195) view = 'rear';
+    else if (a >= 75 && a <= 105) view = 'left';
+    else if (a >= 255 && a <= 285) view = 'right';
+    else if (a > 15 && a < 75) view = 'front';
+    else if (a > 105 && a < 165) view = 'left';
+    else if (a > 195 && a < 255) view = 'rear';
+    else view = 'right';
+
+    const orthoKey = view as OrthoKey;
+    this.updateOrthoFrustum(orthoKey, 4, 3);
+    const cam = this.orthoCameras[orthoKey];
+    const projected = point.clone().project(cam);
+    const nx = THREE.MathUtils.clamp((projected.x + 1) / 2, 0, 1);
+    const ny = THREE.MathUtils.clamp((1 - projected.y) / 2, 0, 1);
+
+    return { view, x: nx, y: ny };
+  }
+
   public start360HeroTransition(): void {
     this.transitionGoalPos.set(...HERO_360_PRESET.pos);
     this.transitionGoalTarget.set(...HERO_360_PRESET.target);

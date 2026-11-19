@@ -28,15 +28,27 @@ const RENDER_CYCLE: RenderStyle[] = ['pbr', 'clay', 'wireframe'];
 interface ToyotaHiAceViewerProps {
   height?: string;
   modelScale?: number;
+  initialView?: CameraViewId;
+  layoutMode?: LayoutMode;
+  hideControls?: boolean;
 }
 
 export default function ToyotaHiAceViewer({
   height = '450px',
+  initialView,
+  layoutMode,
+  hideControls = false,
 }: ToyotaHiAceViewerProps) {
   const canvasMountRef = useRef<HTMLDivElement | null>(null);
   const engineRef = useRef<HiAceViewportEngine | null>(null);
 
-  const [sceneState, setSceneState] = useState<HiAceSceneState>(INITIAL_STATE);
+  const initialState: HiAceSceneState = {
+    ...INITIAL_STATE,
+    layoutMode: layoutMode ?? INITIAL_STATE.layoutMode,
+    activeSingleView: initialView ?? INITIAL_STATE.activeSingleView,
+  };
+
+  const [sceneState, setSceneState] = useState<HiAceSceneState>(initialState);
   const [azimuthDeg, setAzimuthDeg] = useState(43);
   const [contextError, setContextError] = useState<string | null>(null);
 
@@ -62,7 +74,7 @@ export default function ToyotaHiAceViewer({
 
     let engine: HiAceViewportEngine | null = null;
     try {
-      engine = new HiAceViewportEngine(mountEl, INITIAL_STATE, {
+      engine = new HiAceViewportEngine(mountEl, initialState, {
         onPartClick: (part) => handlePartClickRef.current(part),
         onPartHover: (info) => {},
         onAzimuthChange: (deg) => setAzimuthDeg(deg),
@@ -206,6 +218,7 @@ export default function ToyotaHiAceViewer({
         flexDirection: 'column',
       }}
     >
+      {!hideControls && (
       <div
         style={{
           display: 'flex',
@@ -278,7 +291,8 @@ export default function ToyotaHiAceViewer({
         </button>
       </div>
 
-      <div ref={canvasMountRef} style={{ flex: 1, width: '100%', minHeight: 0 }} />
+      )}
+<div ref={canvasMountRef} style={{ flex: 1, width: '100%', minHeight: 0 }} />
     </div>
   );
 }
