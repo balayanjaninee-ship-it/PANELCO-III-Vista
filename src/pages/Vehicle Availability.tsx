@@ -1311,7 +1311,7 @@ function Review({
   onSubmit: () => void;
 }) {
   if (submitted) {
-    return <ReservationRecord vehicle={vehicle} onBack={onPrevious} showToast={showToast} />;
+    return <ReservationRecord vehicle={vehicle} onBack={onPrevious} showToast={showToast} damageMarks={damageMarks} />;
   }
   return (
     <>
@@ -1478,11 +1478,23 @@ function ReservationRecord({
   vehicle,
   onBack,
   showToast,
+  damageMarks = [],
 }: {
   vehicle: (typeof vehicles)[number];
   onBack: () => void;
   showToast: (message: string) => void;
+  damageMarks?: DamageMark[];
 }) {
+  const [printingAll, setPrintingAll] = useState(false);
+
+  useEffect(() => {
+    if (!printingAll) return;
+    const t = window.setTimeout(() => {
+      window.print();
+      setPrintingAll(false);
+    }, 400);
+    return () => window.clearTimeout(t);
+  }, [printingAll]);
   return (
     <>
       <div className="record-success">
@@ -1577,8 +1589,8 @@ function ReservationRecord({
           <button
             className="record-print-button"
             onClick={() => {
-              showToast("Opening saved record for printing.");
-              window.setTimeout(() => window.print(), 350);
+              showToast("Preparing all 4 documents for printing.");
+              setPrintingAll(true);
             }}
           >
             <Icon name="printer" size={17} /> Print Saved Documents
@@ -1610,6 +1622,51 @@ function ReservationRecord({
           </button>
         </div>
       </div>
+
+      {printingAll && (
+        <div className="print-package">
+          <style>{`
+            @media print {
+              body * { visibility: hidden; }
+              .print-package, .print-package * { visibility: visible; }
+              .print-package { position: absolute; left: 0; top: 0; width: 100%; }
+            }
+          `}</style>
+          <h1 style={{ textAlign: "center" }}>VH-2025-0618-024 — Trip Documents</h1>
+          <h2>Daily Driver’s Trip Ticket + Gate Pass</h2>
+          <TripTicketForm
+            defaults={{
+              driver_name: "Roberto A. Santos",
+              vehicle: "Toyota Hilux · NBO 4831",
+              destination: "Urdaneta City Substation",
+              purpose: "Routine inspection",
+              date: "June 18, 2025 · 7:30 AM",
+            }}
+          />
+          <h2>Vehicle Inspection Checklist</h2>
+          <ul>
+            {[
+              "Tire condition and pressure",
+              "Brakes and parking brake",
+              "Headlights, signals, and brake lights",
+              "Horn and warning devices",
+              "Side and rear-view mirrors",
+              "Windshield and wipers",
+              "Engine oil, coolant, and brake fluid",
+              "Seatbelts and other safety conditions",
+            ].map((item) => (
+              <li key={item}>{item} — Good</li>
+            ))}
+          </ul>
+          <h2>Four-View Vehicle Sketch</h2>
+          <FourViewDamageSketch
+            initialMarks={damageMarks}
+            onMarksChange={() => {}}
+            vehiclePlate={vehicle.plate}
+            vehicleModel={`${vehicle.name} · ${vehicle.model}`}
+          />
+        </div>
+      )}
     </>
   );
 }
