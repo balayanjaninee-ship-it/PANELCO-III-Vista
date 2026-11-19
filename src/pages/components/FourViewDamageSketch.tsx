@@ -156,6 +156,7 @@ export default function FourViewDamageSketch({
         x: nx,
         y: ny,
       };
+      try { window.alert('mark created: ' + view + ' ' + nx.toFixed(2) + ' ' + ny.toFixed(2)); } catch {}
 
       setDamageMarks((prev) => {
         const next = [...prev, newMark];
