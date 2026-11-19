@@ -518,7 +518,9 @@ export default function FourViewDamageSketch({
           background: '#11151b',
         }}
       >
-        <ToyotaHiAceViewer height="100%" layoutMode="quad" hideControls />
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>
+          3D view temporarily disabled for debugging
+        </div>
 
         {/* Quadrant divider lines */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2 }}>
