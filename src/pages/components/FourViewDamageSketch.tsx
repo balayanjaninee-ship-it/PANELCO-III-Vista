@@ -42,33 +42,6 @@ export default function FourViewDamageSketch({
   const [rotateMode, setRotateMode] = useState(false);
   const [selectedMarkId, setSelectedMarkId] = useState<string | null>(null);
 
-  // Native touch listeners (React's synthetic touch events are passive on some
-  // browsers, which prevents preventDefault and breaks tap-to-mark on mobile).
-  useEffect(() => {
-    const el = overlayRef.current;
-    if (!el) return;
-
-    const onTouchStart = (e: TouchEvent) => {
-      if (rotateMode) return;
-      // Prevent the browser from interpreting the touch as scroll/zoom
-      e.preventDefault();
-    };
-    const onTouchEnd = (e: TouchEvent) => {
-      if (rotateMode) return;
-      const t = e.changedTouches && e.changedTouches[0];
-      if (t) {
-        e.preventDefault();
-        placeMarkAt(t.clientX, t.clientY);
-      }
-    };
-
-    el.addEventListener('touchstart', onTouchStart, { passive: false });
-    el.addEventListener('touchend', onTouchEnd, { passive: false });
-    return () => {
-      el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchend', onTouchEnd);
-    };
-  }, [rotateMode, placeMarkAt]);
   const canvasMountRef = useRef<HTMLDivElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const engineRef = useRef<HiAceViewportEngine | null>(null);
@@ -189,6 +162,33 @@ export default function FourViewDamageSketch({
     },
     [azimuthDeg, getViewFromAzimuth, is360, selectedView, rotateMode, onMarksChange]
   );
+
+  // Native touch listeners (React's synthetic touch events are passive on some
+  // browsers, which prevents preventDefault and breaks tap-to-mark on mobile).
+  useEffect(() => {
+    const el = overlayRef.current;
+    if (!el) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (rotateMode) return;
+      e.preventDefault();
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (rotateMode) return;
+      const t = e.changedTouches && e.changedTouches[0];
+      if (t) {
+        e.preventDefault();
+        placeMarkAt(t.clientX, t.clientY);
+      }
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: false });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [rotateMode, placeMarkAt]);
 
   const removeMark = useCallback((id: string) => {
     setDamageMarks((prev) => {
@@ -518,9 +518,7 @@ export default function FourViewDamageSketch({
           background: '#11151b',
         }}
       >
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>
-          3D view temporarily disabled for debugging
-        </div>
+        <ToyotaHiAceViewer height="100%" layoutMode="quad" hideControls />
 
         {/* Quadrant divider lines */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2 }}>
