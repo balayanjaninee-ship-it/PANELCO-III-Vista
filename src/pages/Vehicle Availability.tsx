@@ -1311,7 +1311,11 @@ function Review({
   onSubmit: () => void;
 }) {
   if (submitted) {
-    return <ReservationRecord vehicle={vehicle} onBack={onPrevious} showToast={showToast} damageMarks={damageMarks} />;
+    return (
+  <ErrorBoundary>
+    <ReservationRecord vehicle={vehicle} onBack={onPrevious} showToast={showToast} damageMarks={damageMarks} />
+  </ErrorBoundary>
+);
   }
   return (
     <>
